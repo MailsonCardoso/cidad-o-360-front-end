@@ -79,8 +79,9 @@ const AdminDemandas = () => {
   };
 
   const filteredDemandas = demandas.filter((demanda) => {
-    // Exclude "Em andamento" and "Concluído" statuses
-    if (demanda.status === "Em andamento" || demanda.status === "Concluído") {
+    // Only exclude "Em andamento" and "Concluído" for non-admin users
+    // Admins should see all statuses
+    if (user.role !== 'admin' && (demanda.status === "Em andamento" || demanda.status === "Concluído")) {
       return false;
     }
 
@@ -94,8 +95,10 @@ const AdminDemandas = () => {
     );
   });
 
-  // Define available options for filtering
-  const availableStatusOptions = ["Aberto", "Encaminhada"];
+  // Define available options for filtering - admins see all, others see limited
+  const availableStatusOptions = user.role === 'admin'
+    ? statusOptions
+    : ["Aberto", "Encaminhada"];
 
   return (
     <div className="space-y-6">
@@ -184,7 +187,7 @@ const AdminDemandas = () => {
               <tr>
                 <th className="rounded-tl-lg w-[25%]">Protocolo</th>
                 <th className="hidden lg:table-cell w-[25%]">Categoria</th>
-                <th className="w-[25%]">Status</th>
+                <th className="w-[25%] text-center">Status</th>
                 <th className="rounded-tr-lg text-right w-[25%]">Ações</th>
               </tr>
             </thead>
@@ -199,7 +202,7 @@ const AdminDemandas = () => {
                       {demanda.categoria}
                     </span>
                   </td>
-                  <td>
+                  <td className="text-center">
                     <span className={`status-badge ${getStatusClass(demanda.status)}`}>
                       {demanda.status}
                     </span>

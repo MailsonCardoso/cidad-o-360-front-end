@@ -96,9 +96,19 @@ const AdminDemandaDetalhe = () => {
           }
         }
 
-        // Navigate back to demandas list after 1.5 seconds
+        // Navigate to appropriate screen based on user role
         setTimeout(() => {
-          navigate("/admin/demandas");
+          if (user.role === 'admin') {
+            navigate("/admin/dashboard");
+          } else if (user.role === 'atendimento') {
+            navigate("/admin/demandas");
+          } else if (user.setor) {
+            // Sector user - navigate to their sector page
+            navigate(`/admin/setor/${encodeURIComponent(user.setor)}`);
+          } else {
+            // Fallback to demandas
+            navigate("/admin/demandas");
+          }
         }, 1500);
       }
     } catch (error) {
@@ -137,13 +147,25 @@ const AdminDemandaDetalhe = () => {
   // Clean description for display (remove the appended metadata)
   const displayDescription = demanda.descricao?.split("--- DADOS DE CONTATO DO SOLICITANTE ---")[0].trim();
 
+  // Determine back URL based on user role
+  const getBackUrl = () => {
+    if (user.role === 'admin') {
+      return "/admin/dashboard";
+    } else if (user.role === 'atendimento') {
+      return "/admin/demandas";
+    } else if (user.setor) {
+      return `/admin/setor/${encodeURIComponent(user.setor)}`;
+    }
+    return "/admin/demandas";
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <Link
-            to="/admin/demandas"
+            to={getBackUrl()}
             className="p-2 hover:bg-muted rounded-full transition-colors"
           >
             <ArrowLeft className="w-5 h-5 text-muted-foreground" />
@@ -281,7 +303,18 @@ const AdminDemandaDetalhe = () => {
           </div>
 
           {/* Action Card - Conditional based on Role */}
-          {user.role === 'atendimento' ? (
+          {demanda.status === "Concluído" && user.role !== 'admin' ? (
+            /* Locked for non-admin users */
+            <div className="card-corporate border-warning/20 shadow-md bg-warning/5">
+              <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Send className="w-4 h-4 text-warning" />
+                Demanda Concluída
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Esta demanda foi concluída. Apenas administradores podem alterar o status de demandas concluídas.
+              </p>
+            </div>
+          ) : user.role === 'atendimento' ? (
             /* Dispatcher View - Forward Only */
             <div className="card-corporate border-secondary/20 shadow-md">
               <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
@@ -297,6 +330,7 @@ const AdminDemandaDetalhe = () => {
                       className="w-full p-2.5 bg-background border border-border rounded-lg text-sm focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all"
                       onChange={(e) => setStatus(`Encaminhada para ${e.target.value}`)}
                       defaultValue=""
+                      disabled={demanda.status === "Concluído" && user.role !== 'admin'}
                     >
                       <option value="" disabled>Escolha o setor...</option>
                       {categories ? (
@@ -323,12 +357,13 @@ const AdminDemandaDetalhe = () => {
                     rows={4}
                     className="w-full p-3 bg-background border border-border rounded-lg text-sm focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all resize-none"
                     placeholder="Escreva o motivo do encaminhamento..."
+                    disabled={demanda.status === "Concluído" && user.role !== 'admin'}
                   />
                 </div>
 
                 <button
                   onClick={handleStatusChange}
-                  disabled={!status.startsWith("Encaminhada")}
+                  disabled={!status.startsWith("Encaminhada") || (demanda.status === "Concluído" && user.role !== 'admin')}
                   className="w-full btn-primary flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Send className="w-4 h-4" />
@@ -352,6 +387,7 @@ const AdminDemandaDetalhe = () => {
                       value={status}
                       onChange={(e) => setStatus(e.target.value)}
                       className="w-full p-2.5 bg-background border border-border rounded-lg text-sm focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all"
+                      disabled={demanda.status === "Concluído" && user.role !== 'admin'}
                     >
                       {statusOptions.map((s) => (
                         <option key={s} value={s}>
@@ -370,12 +406,14 @@ const AdminDemandaDetalhe = () => {
                     rows={4}
                     className="w-full p-3 bg-background border border-border rounded-lg text-sm focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all resize-none"
                     placeholder="Escreva detalhes sobre a atualização..."
+                    disabled={demanda.status === "Concluído" && user.role !== 'admin'}
                   />
                 </div>
 
                 <button
                   onClick={handleStatusChange}
-                  className="w-full btn-primary flex justify-center items-center gap-2"
+                  disabled={demanda.status === "Concluído" && user.role !== 'admin'}
+                  className="w-full btn-primary flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Send className="w-4 h-4" />
                   Salvar Atualização
