@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, User, Phone, Mail, FileText, Paperclip, Send, ArrowRight } from "lucide-react";
 import Timeline from "@/components/shared/Timeline";
 import Modal from "@/components/shared/Modal";
@@ -12,6 +12,7 @@ const AdminDemandaDetalhe = () => {
   const [demanda, setDemanda] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const navigate = useNavigate();
 
   const [status, setStatus] = useState("");
   const [resposta, setResposta] = useState("");
@@ -94,6 +95,11 @@ const AdminDemandaDetalhe = () => {
             setHistorico(formattedHistory);
           }
         }
+
+        // Navigate back to demandas list after 1.5 seconds
+        setTimeout(() => {
+          navigate("/admin/demandas");
+        }, 1500);
       }
     } catch (error) {
       toast.error("Erro ao atualizar status");
