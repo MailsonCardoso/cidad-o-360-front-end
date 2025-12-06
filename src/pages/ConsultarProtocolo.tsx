@@ -1,37 +1,56 @@
 import { useState } from "react";
 import { Search, FileText, AlertCircle } from "lucide-react";
 import Timeline from "@/components/shared/Timeline";
-import { mockDemandas, getStatusClass } from "@/data/mockData";
+import { getStatusClass } from "@/data/mockData";
+import api from "../services/api";
+import { toast } from "sonner";
 
 const ConsultarProtocolo = () => {
   const [protocolo, setProtocolo] = useState("");
-  const [telefone, setTelefone] = useState("");
-  const [demanda, setDemanda] = useState<typeof mockDemandas[0] | null>(null);
+  const [cpf, setCpf] = useState("");
+  const [demanda, setDemanda] = useState<any | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [searched, setSearched] = useState(false);
 
-  const formatPhone = (value: string) => {
+  const formatCPF = (value: string) => {
     return value
       .replace(/\D/g, "")
-      .replace(/(\d{2})(\d)/, "($1) $2")
-      .replace(/(\d{5})(\d)/, "$1-$2")
-      .replace(/(-\d{4})\d+?$/, "$1");
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d{1,2})/, "$1-$2")
+      .replace(/(-\d{2})\d+?$/, "$1");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSearched(true);
+    setNotFound(false);
+    setDemanda(null);
 
-    const found = mockDemandas.find(
-      (d) => d.protocolo.toLowerCase() === protocolo.toLowerCase()
-    );
+    try {
+      const { data } = await api.get(`/consultar/${protocolo}`);
+      if (data.success && data.data) {
+        // Client-side verification of CPF
+        const description = data.data.descricao || "";
+        const cpfClean = cpf.replace(/\D/g, "");
+        const descriptionClean = description.replace(/\D/g, "");
 
-    if (found) {
-      setDemanda(found);
-      setNotFound(false);
-    } else {
-      setDemanda(null);
-      setNotFound(true);
+        // Check if the formatted CPF string is present in the description
+        if (descriptionClean.includes(cpfClean)) {
+          setDemanda(data.data);
+        } else {
+          setNotFound(true);
+        }
+      } else {
+        setNotFound(true);
+      }
+    } catch (error: any) {
+      console.error(error);
+      if (error.response?.status === 404) {
+        setNotFound(true);
+      } else {
+        toast.error("Erro ao consultar protocolo. Tente novamente.");
+      }
     }
   };
 
@@ -48,7 +67,7 @@ const ConsultarProtocolo = () => {
               Consultar Protocolo
             </h1>
             <p className="text-muted-foreground">
-              Acompanhe o andamento da sua demanda informando o número do protocolo.
+              Acompanhe o andamento da sua demanda informando o número do protocolo e CPF.
             </p>
           </div>
 
@@ -66,22 +85,22 @@ const ConsultarProtocolo = () => {
                   onChange={(e) => setProtocolo(e.target.value.toUpperCase())}
                   required
                   className="input-corporate"
-                  placeholder="C360-00000"
+                  placeholder="C360-20240101-ABCD"
                 />
               </div>
               <div>
-                <label htmlFor="telefone" className="label-corporate">
-                  Telefone *
+                <label htmlFor="cpf" className="label-corporate">
+                  CPF *
                 </label>
                 <input
                   type="text"
-                  id="telefone"
-                  value={telefone}
-                  onChange={(e) => setTelefone(formatPhone(e.target.value))}
+                  id="cpf"
+                  value={cpf}
+                  onChange={(e) => setCpf(formatCPF(e.target.value))}
                   required
-                  maxLength={15}
+                  maxLength={14}
                   className="input-corporate"
-                  placeholder="(00) 00000-0000"
+                  placeholder="000.000.000-00"
                 />
               </div>
             </div>
@@ -99,7 +118,7 @@ const ConsultarProtocolo = () => {
                 Protocolo não encontrado
               </h3>
               <p className="text-muted-foreground text-sm">
-                Verifique se o número do protocolo e telefone estão corretos e tente novamente.
+                Verifique se o número do protocolo e CPF estão corretos e tente novamente.
               </p>
             </div>
           )}
@@ -120,32 +139,35 @@ const ConsultarProtocolo = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Categoria</p>
+                    <p className="text-sm text-muted-foreground mb-1">Setor</p>
                     <p className="text-foreground font-medium">{demanda.categoria}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Data de Abertura</p>
-                    <p className="text-foreground font-medium">{demanda.data}</p>
+                    <p className="text-foreground font-medium">{new Date(demanda.created_at).toLocaleDateString()}</p>
                   </div>
                   <div className="md:col-span-2">
                     <p className="text-sm text-muted-foreground mb-1">Assunto</p>
                     <p className="text-foreground font-medium">{demanda.assunto}</p>
                   </div>
-                  <div className="md:col-span-2">
-                    <p className="text-sm text-muted-foreground mb-1">Descrição</p>
-                    <p className="text-foreground text-sm leading-relaxed">{demanda.descricao}</p>
-                  </div>
+
                 </div>
               </div>
 
               {/* Timeline */}
-              <div className="card-corporate">
-                <h3 className="text-lg font-semibold text-foreground mb-6 flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-secondary" />
-                  Histórico
-                </h3>
-                <Timeline items={demanda.historico} />
-              </div>
+              {demanda.historico && demanda.historico.length > 0 && (
+                <div className="card-corporate">
+                  <h3 className="text-lg font-semibold text-foreground mb-6 flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-secondary" />
+                    Histórico
+                  </h3>
+                  <Timeline items={demanda.historico.map((h: any) => ({
+                    date: new Date(h.created_at).toLocaleString(),
+                    status: h.status,
+                    description: h.descricao
+                  }))} />
+                </div>
+              )}
             </div>
           )}
         </div>

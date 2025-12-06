@@ -1,27 +1,79 @@
 import { Link, useLocation } from "react-router-dom";
-import { 
-  LayoutDashboard, 
-  FileText, 
-  Megaphone, 
-  Settings, 
+import {
+  LayoutDashboard,
+  FileText,
+  Megaphone,
+  Settings,
   LogOut,
   Building2,
   Menu,
-  X
+  X,
+  Users as UsersIcon,
+  Shield,
+  FolderOpen,
+  FilePlus
 } from "lucide-react";
 import { useState } from "react";
+import { categories } from "@/data/mockData";
 
 const AdminSidebar = () => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
 
+  // Get User from storage
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const isAdmin = user.role === 'admin';
+  const isDispatcher = user.role === 'atendimento';
+
+  // Base Menu
   const menuItems = [
-    { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/admin/demandas", label: "Demandas", icon: FileText },
-    { href: "/admin/comunicados", label: "Comunicados", icon: Megaphone },
-    { href: "/admin/configuracoes", label: "Configurações", icon: Settings },
+    {
+      href: "/admin/dashboard",
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      visible: isAdmin // Strictly Admin only
+    },
+    {
+      href: "/admin/demandas",
+      label: "Demandas",
+      icon: FileText,
+      visible: isAdmin || isDispatcher || !user.setor
+    },
+    {
+      href: "/admin/cadastro",
+      label: "Cadastro",
+      icon: FilePlus,
+      visible: isDispatcher // Only for Atendimento
+    },
+    {
+      href: "/admin/comunicados",
+      label: "Comunicados",
+      icon: Megaphone,
+      visible: isAdmin || (!user.setor && !isDispatcher) // Hide for Dispatcher
+    },
+    {
+      href: "/admin/usuarios",
+      label: "Usuários",
+      icon: UsersIcon,
+      visible: isAdmin || (!user.setor && !isDispatcher) // Hide for Dispatcher
+    },
+    {
+      href: "/admin/configuracoes",
+      label: "Configurações",
+      icon: Settings,
+      visible: isAdmin
+    },
   ];
 
+  // Dynamic Sector Links
+  const sectorLinks = categories.map(cat => ({
+    href: `/admin/setor/${encodeURIComponent(cat)}`,
+    label: cat,
+    icon: cat === "Segurança Pública" ? Shield : FolderOpen,
+    visible: isAdmin || user.setor === cat
+  }));
+
+  const allLinks = [...menuItems, ...sectorLinks];
   const isActive = (path: string) => location.pathname.startsWith(path);
 
   return (
@@ -44,9 +96,8 @@ const AdminSidebar = () => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-sidebar transform transition-transform duration-300 ${
-          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        }`}
+        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-sidebar transform transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          }`}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
@@ -57,14 +108,13 @@ const AdminSidebar = () => {
               </div>
               <div className="flex flex-col">
                 <span className="text-lg font-bold text-sidebar-foreground">Cidadão 360</span>
-                <span className="text-xs text-sidebar-foreground/60">Painel Admin</span>
               </div>
             </Link>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-1">
-            {menuItems.map((item) => (
+          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+            {allLinks.filter(item => item.visible).map((item) => (
               <Link
                 key={item.href}
                 to={item.href}
@@ -80,7 +130,11 @@ const AdminSidebar = () => {
           {/* Logout */}
           <div className="p-4 border-t border-sidebar-border">
             <Link
-              to="/"
+              to="/admin/login"
+              onClick={() => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+              }}
               className="sidebar-item text-destructive hover:bg-destructive/10"
             >
               <LogOut className="w-5 h-5" />

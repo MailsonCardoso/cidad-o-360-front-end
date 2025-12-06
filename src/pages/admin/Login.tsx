@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Building2, Lock, Mail } from "lucide-react";
+import api from "../../services/api";
+import { toast } from "sonner";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -9,10 +11,36 @@ const AdminLogin = () => {
     senha: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulated login
-    navigate("/admin/dashboard");
+    try {
+      const { data } = await api.post("/login", {
+        email: formData.email,
+        password: formData.senha, // Map 'senha' to 'password'
+      });
+
+      if (data.success) {
+        const user = data.data.user;
+        localStorage.setItem("token", data.data.token);
+        localStorage.setItem("user", JSON.stringify(user));
+        toast.success("Login realizado com sucesso!");
+
+        // Intelligent Redirection
+        if (user.role === 'admin') {
+          navigate("/admin/dashboard");
+        } else if (user.role === 'atendimento') {
+          navigate("/admin/demandas");
+        } else if (user.setor) {
+          navigate(`/admin/setor/${encodeURIComponent(user.setor)}`);
+        } else {
+          // Fallback
+          navigate("/admin/demandas");
+        }
+      }
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Erro ao realizar login");
+    }
   };
 
   return (

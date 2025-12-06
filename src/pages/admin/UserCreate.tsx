@@ -1,0 +1,221 @@
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { UserPlus, Save, X, AlertCircle } from "lucide-react";
+import api from "../../services/api";
+import { toast } from "sonner";
+import { categories } from "@/data/mockData";
+
+const UserCreate = () => {
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        role: "user", // Default
+        setor: "", // Allow empty
+    });
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+
+        // Visual Validations
+        if (formData.password !== formData.confirmPassword) {
+            toast.error("As senhas não conferem.");
+            setLoading(false);
+            return;
+        }
+
+        if (formData.password.length < 6) {
+            toast.error("A senha deve ter pelo menos 6 caracteres.");
+            setLoading(false);
+            return;
+        }
+
+        try {
+            const { data } = await api.post("/users", {
+                name: formData.name,
+                email: formData.email,
+                password: formData.password,
+                role: formData.role,
+                setor: formData.setor || null, // Send null if empty
+            });
+
+            if (data.success) {
+                toast.success("Usuário cadastrado com sucesso!");
+                navigate("/admin/usuarios");
+            }
+        } catch (error: any) {
+            console.error(error);
+            const msg = error.response?.data?.message || "Erro ao cadastrar usuário.";
+            toast.error(msg);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="space-y-6 animate-fade-in">
+            {/* Header */}
+            <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-foreground flex items-center gap-3">
+                    <UserPlus className="w-8 h-8 text-secondary" />
+                    Cadastro de Usuário
+                </h1>
+                <p className="text-muted-foreground mt-2">
+                    Preencha os dados abaixo para cadastrar um novo usuário no sistema.
+                </p>
+            </div>
+
+            {/* Form Card */}
+            <div className="card-corporate max-w-2xl">
+                <form onSubmit={handleSubmit} className="space-y-6">
+
+                    {/* Name */}
+                    <div>
+                        <label htmlFor="name" className="label-corporate">
+                            Nome Completo *
+                        </label>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
+                            className="input-corporate"
+                            placeholder="Ex: João da Silva"
+                        />
+                    </div>
+
+                    {/* Email */}
+                    <div>
+                        <label htmlFor="email" className="label-corporate">
+                            E-mail *
+                        </label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
+                            className="input-corporate"
+                            placeholder="Ex: joao@email.com"
+                        />
+                    </div>
+
+                    {/* Role Selection */}
+                    <div className="space-y-4">
+                        <div>
+                            <label htmlFor="role" className="label-corporate">
+                                Tipo de Usuário *
+                            </label>
+                            <select
+                                id="role"
+                                name="role"
+                                value={formData.role}
+                                onChange={handleChange}
+                                className="input-corporate"
+                            >
+                                <option value="user">Usuário</option>
+                                <option value="admin">Administrador</option>
+                                <option value="atendimento">Atendimento (Triagem)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label htmlFor="setor" className="label-corporate">
+                                Setor Responsável
+                            </label>
+                            <select
+                                id="setor"
+                                name="setor"
+                                value={formData.setor}
+                                onChange={handleChange}
+                                className="input-corporate"
+                            >
+                                <option value="">Nenhum</option>
+                                {categories.map((cat) => (
+                                    <option key={cat} value={cat}>
+                                        {cat}
+                                    </option>
+                                ))}
+                            </select>
+                            <p className="text-xs text-muted-foreground mt-1">
+                                Se selecionado, o usuário terá acesso administrativo às demandas deste setor.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Password */}
+                        <div>
+                            <label htmlFor="password" className="label-corporate">
+                                Senha *
+                            </label>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                required
+                                className="input-corporate"
+                                placeholder="******"
+                                minLength={6}
+                            />
+                        </div>
+
+                        {/* Confirm Password */}
+                        <div>
+                            <label htmlFor="confirmPassword" className="label-corporate">
+                                Confirmar Senha *
+                            </label>
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                required
+                                className="input-corporate"
+                                placeholder="******"
+                                minLength={6}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
+                        <Link
+                            to="/admin/usuarios"
+                            className="btn-ghost flex items-center px-4 py-2"
+                        >
+                            <X className="w-4 h-4 mr-2" />
+                            Cancelar
+                        </Link>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="btn-primary flex items-center px-6 py-2"
+                        >
+                            <Save className="w-4 h-4 mr-2" />
+                            {loading ? "Salvando..." : "Salvar"}
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    );
+};
+
+export default UserCreate;

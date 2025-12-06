@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Upload, CheckCircle, FileText } from "lucide-react";
 import Modal from "@/components/shared/Modal";
-import { categories, generateProtocol } from "@/data/mockData";
+import api from "../services/api";
+import { toast } from "sonner";
 
 const RegistrarDemanda = () => {
   const [formData, setFormData] = useState({
@@ -29,11 +30,41 @@ const RegistrarDemanda = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newProtocolo = generateProtocol();
-    setProtocolo(newProtocolo);
-    setIsModalOpen(true);
+
+    try {
+      const data = new FormData();
+      data.append("categoria", "Triagem"); // Default category for public requests
+      data.append("assunto", formData.assunto);
+
+      // Append contact info to description for guest users
+      const fullDescription = `${formData.descricao}
+
+--- DADOS DE CONTATO DO SOLICITANTE ---
+Solicitante: ${formData.nome}
+CPF: ${formData.cpf}
+Tel: ${formData.telefone}
+Email: ${formData.email}`;
+      data.append("descricao", fullDescription);
+
+      if (formData.arquivo) {
+        data.append("arquivo", formData.arquivo);
+      }
+
+      const response = await api.post("/demandas", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (response.data.success) {
+        setProtocolo(response.data.data.protocolo);
+        setIsModalOpen(true);
+        // Reset form?
+      }
+    } catch (error: any) {
+      console.error(error);
+      toast.error("Erro ao registrar demanda. Tente novamente.");
+    }
   };
 
   const formatCPF = (value: string) => {
@@ -144,26 +175,7 @@ const RegistrarDemanda = () => {
               </div>
             </div>
 
-            <div>
-              <label htmlFor="categoria" className="label-corporate">
-                Categoria *
-              </label>
-              <select
-                id="categoria"
-                name="categoria"
-                value={formData.categoria}
-                onChange={handleChange}
-                required
-                className="input-corporate"
-              >
-                <option value="">Selecione uma categoria</option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {/* Sector selection removed - defaulting to 'Triagem' */}
 
             <div>
               <label htmlFor="assunto" className="label-corporate">

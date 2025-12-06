@@ -24,6 +24,13 @@ import AdminDemandas from "@/pages/admin/Demandas";
 import AdminDemandaDetalhe from "@/pages/admin/DemandaDetalhe";
 import AdminComunicados from "@/pages/admin/Comunicados";
 import AdminConfiguracoes from "@/pages/admin/Configuracoes";
+import AdminUserCreate from "@/pages/admin/UserCreate";
+import AdminUsers from "@/pages/admin/Users";
+import AdminUserEdit from "@/pages/admin/UserEdit";
+import AdminSegurancaPublica from "@/pages/admin/SegurancaPublica";
+import AdminSetorDemandas from "@/pages/admin/SetorDemandas";
+import AdminChangePassword from "@/pages/admin/ChangePassword";
+import AdminCadastroDemanda from "@/pages/admin/CadastroDemanda"; // Import new page
 
 const queryClient = new QueryClient();
 
@@ -49,13 +56,18 @@ const App = () => (
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="demandas" element={<AdminDemandas />} />
+            <Route path="cadastro" element={<AdminCadastroDemanda />} /> {/* New Route */}
             <Route path="demandas/:id" element={<AdminDemandaDetalhe />} />
             <Route path="comunicados" element={<AdminComunicados />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="usuarios" element={<AdminUsers />} />
+            <Route path="usuarios/cadastrar" element={<AdminUserCreate />} />
+            <Route path="usuarios/:id/editar" element={<AdminUserEdit />} />
+            <Route path="seguranca-publica" element={<AdminSegurancaPublica />} />
+            <Route path="setor/:categoria" element={<AdminSetorDemandas />} />
+            <Route path="alterar-senha" element={<AdminChangePassword />} />
             <Route path="configuracoes" element={<AdminConfiguracoes />} />
           </Route>
-
-          {/* 404 */}
-          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
