@@ -24,6 +24,9 @@ const SetorDemandas = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
+    // Get user role
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+
     const fetchDemandas = async () => {
         if (!categoria) return;
 
@@ -93,9 +96,9 @@ const SetorDemandas = () => {
                     <span className="font-medium text-foreground">Filtros</span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className={`grid grid-cols-1 ${user.role === 'admin' ? 'sm:grid-cols-2 lg:grid-cols-3' : 'sm:grid-cols-2'} gap-4`}>
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <input
                             type="text"
                             value={searchTerm}
@@ -104,35 +107,39 @@ const SetorDemandas = () => {
                                 setCurrentPage(1);
                             }}
                             placeholder="Buscar por protocolo..."
-                            className="input-corporate pl-10"
+                            className="input-corporate pl-9 py-2 text-sm"
                         />
                     </div>
 
-                    <select
-                        value={filterStatus}
-                        onChange={(e) => {
-                            setFilterStatus(e.target.value);
-                            setCurrentPage(1);
-                        }}
-                        className="input-corporate"
-                    >
-                        <option value="">Todos os status</option>
-                        {statusOptions.map((status) => (
-                            <option key={status} value={status}>
-                                {status}
-                            </option>
-                        ))}
-                    </select>
+                    {/* Hide status filter for non-admin users */}
+                    {user.role === 'admin' && (
+                        <select
+                            value={filterStatus}
+                            onChange={(e) => {
+                                setFilterStatus(e.target.value);
+                                setCurrentPage(1);
+                            }}
+                            className="input-corporate"
+                        >
+                            <option value="">Todos os status</option>
+                            {statusOptions.map((status) => (
+                                <option key={status} value={status}>
+                                    {status}
+                                </option>
+                            ))}
+                        </select>
+                    )}
 
+                    {/* Clear button for all users */}
                     <button
                         onClick={() => {
                             setSearchTerm("");
                             setFilterStatus("");
                             setCurrentPage(1);
                         }}
-                        className="btn-outline text-sm"
+                        className="btn-outline text-xs py-1.5 px-2.5 h-9 w-auto"
                     >
-                        Limpar Filtros
+                        Limpar
                     </button>
                 </div>
             </div>

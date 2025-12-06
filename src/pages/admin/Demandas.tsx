@@ -119,9 +119,9 @@ const AdminDemandas = () => {
           <span className="font-medium text-foreground">Filtros</span>
         </div>
 
-        <div className={`grid grid-cols-1 ${isDispatcher ? 'sm:grid-cols-1' : 'sm:grid-cols-2 lg:grid-cols-4'} gap-4`}>
+        <div className={`grid grid-cols-1 ${isDispatcher ? 'sm:grid-cols-2' : 'sm:grid-cols-2 lg:grid-cols-4'} gap-4`}>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
               value={searchTerm}
@@ -130,7 +130,7 @@ const AdminDemandas = () => {
                 setCurrentPage(1);
               }}
               placeholder="Buscar..."
-              className="input-corporate pl-10"
+              className="input-corporate pl-9 py-2 text-sm"
             />
           </div>
 
@@ -168,20 +168,21 @@ const AdminDemandas = () => {
                   </option>
                 ))}
               </select>
-
-              <button
-                onClick={() => {
-                  setSearchTerm("");
-                  setFilterCategoria("");
-                  setFilterStatus("");
-                  setCurrentPage(1);
-                }}
-                className="btn-outline text-sm"
-              >
-                Limpar Filtros
-              </button>
             </>
           )}
+
+          {/* Clear button for all users */}
+          <button
+            onClick={() => {
+              setSearchTerm("");
+              setFilterCategoria("");
+              setFilterStatus("");
+              setCurrentPage(1);
+            }}
+            className="btn-outline text-xs py-1.5 px-2.5 h-9 w-auto"
+          >
+            Limpar
+          </button>
         </div>
       </div>
 
