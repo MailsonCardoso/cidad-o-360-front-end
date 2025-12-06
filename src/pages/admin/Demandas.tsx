@@ -79,9 +79,9 @@ const AdminDemandas = () => {
   };
 
   const filteredDemandas = demandas.filter((demanda) => {
-    // Only exclude "Em andamento" and "Concluído" for non-admin users
-    // Admins should see all statuses
-    if (user.role !== 'admin' && (demanda.status === "Em andamento" || demanda.status === "Concluído")) {
+    // Dispatcher and sector users should see all statuses for reference
+    // Only exclude "Em andamento" and "Concluído" for sector users (not dispatcher)
+    if (user.setor && (demanda.status === "Em andamento" || demanda.status === "Concluído")) {
       return false;
     }
 
@@ -95,8 +95,9 @@ const AdminDemandas = () => {
     );
   });
 
-  // Define available options for filtering - admins see all, others see limited
-  const availableStatusOptions = user.role === 'admin'
+  // Define available options for filtering
+  // Admin and Dispatcher see all, sector users see limited
+  const availableStatusOptions = (user.role === 'admin' || isDispatcher)
     ? statusOptions
     : ["Aberto", "Encaminhada"];
 
@@ -118,7 +119,7 @@ const AdminDemandas = () => {
           <span className="font-medium text-foreground">Filtros</span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className={`grid grid-cols-1 ${isDispatcher ? 'sm:grid-cols-1' : 'sm:grid-cols-2 lg:grid-cols-4'} gap-4`}>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <input
@@ -133,49 +134,54 @@ const AdminDemandas = () => {
             />
           </div>
 
-          <select
-            value={filterCategoria}
-            onChange={(e) => {
-              setFilterCategoria(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="input-corporate"
-          >
-            <option value="">Todas as categorias</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
+          {/* Hide category and status filters for dispatcher */}
+          {!isDispatcher && (
+            <>
+              <select
+                value={filterCategoria}
+                onChange={(e) => {
+                  setFilterCategoria(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="input-corporate"
+              >
+                <option value="">Todas as categorias</option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
 
-          <select
-            value={filterStatus}
-            onChange={(e) => {
-              setFilterStatus(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="input-corporate"
-          >
-            <option value="">Todos os status</option>
-            {availableStatusOptions.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
+              <select
+                value={filterStatus}
+                onChange={(e) => {
+                  setFilterStatus(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="input-corporate"
+              >
+                <option value="">Todos os status</option>
+                {availableStatusOptions.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
 
-          <button
-            onClick={() => {
-              setSearchTerm("");
-              setFilterCategoria("");
-              setFilterStatus("");
-              setCurrentPage(1);
-            }}
-            className="btn-outline text-sm"
-          >
-            Limpar Filtros
-          </button>
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setFilterCategoria("");
+                  setFilterStatus("");
+                  setCurrentPage(1);
+                }}
+                className="btn-outline text-sm"
+              >
+                Limpar Filtros
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -208,13 +214,18 @@ const AdminDemandas = () => {
                     </span>
                   </td>
                   <td className="text-right">
-                    <Link
-                      to={`/admin/demandas/${demanda.id}`}
-                      className="inline-flex items-center gap-1 text-secondary hover:underline text-sm font-medium"
-                    >
-                      <Eye className="w-4 h-4" />
-                      Ver
-                    </Link>
+                    {/* Dispatcher can only view "Aberto" demands, others are read-only for reference */}
+                    {isDispatcher && demanda.status !== "Aberto" ? (
+                      <span className="text-xs text-muted-foreground italic">Encaminhada</span>
+                    ) : (
+                      <Link
+                        to={`/admin/demandas/${demanda.id}`}
+                        className="inline-flex items-center gap-1 text-secondary hover:underline text-sm font-medium"
+                      >
+                        <Eye className="w-4 h-4" />
+                        Ver
+                      </Link>
+                    )}
                   </td>
                 </tr>
               ))}
