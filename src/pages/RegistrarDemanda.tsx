@@ -84,6 +84,11 @@ Email: ${formData.email}`;
       .replace(/(-\d{4})\d+?$/, "$1");
   };
 
+  const handleCloseArgs = () => {
+    setIsModalOpen(false);
+    window.location.reload();
+  };
+
   return (
     <div className="py-12">
       <div className="container mx-auto px-4">
@@ -245,7 +250,7 @@ Email: ${formData.email}`;
       </div>
 
       {/* Success Modal */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Demanda Registrada">
+      <Modal isOpen={isModalOpen} onClose={handleCloseArgs} title="Demanda Registrada">
         <div className="text-center">
           <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-8 h-8 text-success" />
@@ -263,7 +268,7 @@ Email: ${formData.email}`;
             Guarde este número para acompanhar o andamento da sua solicitação.
           </p>
           <button
-            onClick={() => setIsModalOpen(false)}
+            onClick={handleCloseArgs}
             className="btn-primary"
           >
             Entendido

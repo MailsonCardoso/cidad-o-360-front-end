@@ -33,7 +33,7 @@ const AdminDemandaDetalhe = () => {
               date: new Date(h.created_at).toLocaleDateString("pt-BR") + " - " +
                 new Date(h.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
               status: h.status,
-              description: h.descricao,
+              description: h.descricao + (h.user ? ` (Por: ${h.user.name})` : ""),
             }));
             setHistorico(formattedHistory);
           } else {
@@ -90,7 +90,7 @@ const AdminDemandaDetalhe = () => {
               date: new Date(h.created_at).toLocaleDateString("pt-BR") + " - " +
                 new Date(h.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
               status: h.status,
-              description: h.descricao,
+              description: h.descricao + (h.user ? ` (Por: ${h.user.name})` : ""),
             }));
             setHistorico(formattedHistory);
           }

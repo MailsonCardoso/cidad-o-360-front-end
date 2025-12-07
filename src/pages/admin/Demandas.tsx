@@ -215,7 +215,7 @@ const AdminDemandas = () => {
                     </span>
                   </td>
                   <td className="text-right">
-                    {/* Dispatcher can only view "Aberto" demands, others are read-only for reference */}
+                    {/* Dispatcher Actions */}
                     {isDispatcher && demanda.status !== "Aberto" ? (
                       <span className="text-xs text-muted-foreground italic">Encaminhada</span>
                     ) : (

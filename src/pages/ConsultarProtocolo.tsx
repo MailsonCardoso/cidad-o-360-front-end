@@ -164,7 +164,7 @@ const ConsultarProtocolo = () => {
                   <Timeline items={demanda.historico.map((h: any) => ({
                     date: new Date(h.created_at).toLocaleString(),
                     status: h.status,
-                    description: h.descricao
+                    description: h.descricao.replace(/ por .*$/i, '')
                   }))} />
                 </div>
               )}
