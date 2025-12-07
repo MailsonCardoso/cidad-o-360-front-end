@@ -1,29 +1,55 @@
-import { useState } from "react";
-import { Megaphone, Plus, Edit, Trash2, X, Upload } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Megaphone, Plus, Edit, Trash2, Upload } from "lucide-react";
 import Modal from "@/components/shared/Modal";
-import { mockComunicados } from "@/data/mockData";
+import api from "../../services/api";
+import { toast } from "sonner";
 
 interface Comunicado {
-  id: string;
+  id: number;
   titulo: string;
-  data: string;
+  data_publicacao: string;
   resumo: string;
   conteudo: string;
 }
 
 const AdminComunicados = () => {
-  const [comunicados, setComunicados] = useState<Comunicado[]>(mockComunicados);
+  const [comunicados, setComunicados] = useState<Comunicado[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const [formData, setFormData] = useState({
     titulo: "",
     resumo: "",
     conteudo: "",
-    data: new Date().toLocaleDateString("pt-BR"),
+    data_publicacao: new Date().toISOString().split('T')[0],
   });
+
+  const fetchComunicados = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get("/comunicados");
+      // The API returns paginated data structure: { data: [...], ... }
+      // Or sometimes directly the array depending on controller implementation.
+      // Based on controller it returns: { success: true, data: { current_page: ..., data: [...] } }
+      if (response.data.success && response.data.data.data) {
+        setComunicados(response.data.data.data);
+      } else {
+        setComunicados([]);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar comunicados:", error);
+      toast.error("Erro ao carregar comunicados.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchComunicados();
+  }, []);
 
   const handleOpenNew = () => {
     setEditingId(null);
@@ -31,7 +57,7 @@ const AdminComunicados = () => {
       titulo: "",
       resumo: "",
       conteudo: "",
-      data: new Date().toLocaleDateString("pt-BR"),
+      data_publicacao: new Date().toISOString().split('T')[0],
     });
     setIsModalOpen(true);
   };
@@ -42,42 +68,48 @@ const AdminComunicados = () => {
       titulo: comunicado.titulo,
       resumo: comunicado.resumo,
       conteudo: comunicado.conteudo,
-      data: comunicado.data,
+      data_publicacao: new Date(comunicado.data_publicacao).toISOString().split('T')[0],
     });
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id: number) => {
     setDeletingId(id);
     setIsDeleteModalOpen(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deletingId) {
-      setComunicados(comunicados.filter((c) => c.id !== deletingId));
-      setIsDeleteModalOpen(false);
-      setDeletingId(null);
+      try {
+        await api.delete(`/comunicados/${deletingId}`);
+        toast.success("Comunicado excluído com sucesso.");
+        fetchComunicados();
+        setIsDeleteModalOpen(false);
+        setDeletingId(null);
+      } catch (error) {
+        console.error("Erro ao excluir comunicado:", error);
+        toast.error("Erro ao excluir comunicado.");
+      }
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (editingId) {
-      setComunicados(
-        comunicados.map((c) =>
-          c.id === editingId ? { ...c, ...formData } : c
-        )
-      );
-    } else {
-      const newComunicado: Comunicado = {
-        id: String(Date.now()),
-        ...formData,
-      };
-      setComunicados([newComunicado, ...comunicados]);
+    try {
+      if (editingId) {
+        await api.put(`/comunicados/${editingId}`, formData);
+        toast.success("Comunicado atualizado com sucesso.");
+      } else {
+        await api.post("/comunicados", formData);
+        toast.success("Comunicado criado com sucesso.");
+      }
+      fetchComunicados();
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Erro ao salvar comunicado:", error);
+      toast.error("Erro ao salvar comunicado.");
     }
-
-    setIsModalOpen(false);
   };
 
   return (
@@ -99,42 +131,49 @@ const AdminComunicados = () => {
       </div>
 
       {/* List */}
-      <div className="grid gap-4">
-        {comunicados.map((comunicado) => (
-          <div key={comunicado.id} className="card-corporate">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 text-muted-foreground text-sm mb-2">
-                  <span>{comunicado.data}</span>
-                </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">
-                  {comunicado.titulo}
-                </h3>
-                <p className="text-muted-foreground text-sm">{comunicado.resumo}</p>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleEdit(comunicado)}
-                  className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-secondary"
-                >
-                  <Edit className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => handleDelete(comunicado.id)}
-                  className="p-2 rounded-lg hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive"
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              </div>
+      {loading ? (
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary mx-auto"></div>
+          <p className="text-muted-foreground mt-2">Carregando comunicados...</p>
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          {comunicados.length === 0 ? (
+            <div className="card-corporate text-center py-12">
+              <p className="text-muted-foreground">Nenhum comunicado cadastrado.</p>
             </div>
-          </div>
-        ))}
-      </div>
+          ) : (
+            comunicados.map((comunicado) => (
+              <div key={comunicado.id} className="card-corporate">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 text-muted-foreground text-sm mb-2">
+                      <span>{new Date(comunicado.data_publicacao).toLocaleDateString('pt-BR')}</span>
+                    </div>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">
+                      {comunicado.titulo}
+                    </h3>
+                    <p className="text-muted-foreground text-sm">{comunicado.resumo}</p>
+                  </div>
 
-      {comunicados.length === 0 && (
-        <div className="card-corporate text-center py-12">
-          <p className="text-muted-foreground">Nenhum comunicado cadastrado.</p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleEdit(comunicado)}
+                      className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-secondary"
+                    >
+                      <Edit className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(comunicado.id)}
+                      className="p-2 rounded-lg hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       )}
 
@@ -144,69 +183,91 @@ const AdminComunicados = () => {
         onClose={() => setIsModalOpen(false)}
         title={editingId ? "Editar Comunicado" : "Novo Comunicado"}
       >
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="label-corporate">Título *</label>
-            <input
-              type="text"
-              value={formData.titulo}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, titulo: e.target.value }))
-              }
-              required
-              className="input-corporate"
-              placeholder="Título do comunicado"
-            />
-          </div>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1.5">
+                Título do Comunicado *
+              </label>
+              <input
+                type="text"
+                value={formData.titulo}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, titulo: e.target.value }))
+                }
+                required
+                className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-secondary/20 focus:border-secondary transition-all"
+                placeholder="Ex: Novo horário de funcionamento"
+              />
+            </div>
 
-          <div>
-            <label className="label-corporate">Resumo *</label>
-            <input
-              type="text"
-              value={formData.resumo}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, resumo: e.target.value }))
-              }
-              required
-              className="input-corporate"
-              placeholder="Breve resumo do comunicado"
-            />
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">
+                  Data de Publicação *
+                </label>
+                <input
+                  type="date"
+                  value={formData.data_publicacao}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, data_publicacao: e.target.value }))
+                  }
+                  required
+                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-secondary/20 focus:border-secondary transition-all"
+                />
+              </div>
+            </div>
 
-          <div>
-            <label className="label-corporate">Conteúdo *</label>
-            <textarea
-              value={formData.conteudo}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, conteudo: e.target.value }))
-              }
-              required
-              rows={6}
-              className="input-corporate resize-none"
-              placeholder="Conteúdo completo do comunicado (suporta HTML)..."
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1.5">
+                Resumo *
+              </label>
+              <input
+                type="text"
+                value={formData.resumo}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, resumo: e.target.value }))
+                }
+                required
+                className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-secondary/20 focus:border-secondary transition-all"
+                placeholder="Uma breve descrição que aparecerá na listagem"
+              />
+              <p className="text-xs text-muted-foreground mt-1">Este texto será exibido nos cards da lista de comunicados.</p>
+            </div>
 
-          <div>
-            <label className="label-corporate">Anexo (opcional)</label>
-            <div className="border-2 border-dashed border-border rounded-lg p-4 text-center hover:border-secondary/50 transition-colors">
-              <Upload className="w-6 h-6 text-muted-foreground mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">
-                Clique para anexar arquivo
-              </p>
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1.5">
+                Conteúdo Completo *
+              </label>
+              <div className="relative">
+                <textarea
+                  value={formData.conteudo}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, conteudo: e.target.value }))
+                  }
+                  required
+                  rows={8}
+                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-secondary/20 focus:border-secondary transition-all resize-y"
+                  placeholder="Digite o conteúdo completo do comunicado..."
+                />
+                <p className="text-xs text-muted-foreground mt-1">Suporta formatação básica HTML.</p>
+              </div>
             </div>
           </div>
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3 pt-4 border-t border-border mt-6">
             <button
               type="button"
               onClick={() => setIsModalOpen(false)}
-              className="btn-outline flex-1"
+              className="px-4 py-2 border border-border rounded-lg text-sm font-medium hover:bg-muted transition-colors flex-1"
             >
               Cancelar
             </button>
-            <button type="submit" className="btn-primary flex-1">
-              {editingId ? "Salvar" : "Criar"}
+            <button
+              type="submit"
+              className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg text-sm font-medium hover:bg-secondary/90 transition-colors flex-1"
+            >
+              {editingId ? "Salvar Alterações" : "Publicar Comunicado"}
             </button>
           </div>
         </form>

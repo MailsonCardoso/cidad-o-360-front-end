@@ -1,12 +1,56 @@
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Calendar, Share2 } from "lucide-react";
-import { mockComunicados } from "@/data/mockData";
+import api from "../services/api";
+
+interface Comunicado {
+  id: number;
+  titulo: string;
+  data_publicacao: string;
+  resumo: string;
+  conteudo: string;
+}
 
 const ComunicadoDetalhe = () => {
   const { id } = useParams();
-  const comunicado = mockComunicados.find((c) => c.id === id);
+  const [comunicado, setComunicado] = useState<Comunicado | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  if (!comunicado) {
+  useEffect(() => {
+    const fetchComunicado = async () => {
+      try {
+        const response = await api.get(`/comunicados/${id}`);
+        if (response.data.success) {
+          setComunicado(response.data.data);
+        } else {
+          setError(true);
+        }
+      } catch (err) {
+        console.error("Erro ao carregar comunicado:", err);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchComunicado();
+    }
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="py-12">
+        <div className="container mx-auto px-4 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando comunicado...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !comunicado) {
     return (
       <div className="py-12">
         <div className="container mx-auto px-4 text-center">
@@ -39,7 +83,7 @@ const ComunicadoDetalhe = () => {
             <header className="mb-6">
               <div className="flex items-center gap-2 text-muted-foreground text-sm mb-4">
                 <Calendar className="w-4 h-4" />
-                <span>{comunicado.data}</span>
+                <span>{new Date(comunicado.data_publicacao).toLocaleDateString('pt-BR')}</span>
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-foreground">
                 {comunicado.titulo}
