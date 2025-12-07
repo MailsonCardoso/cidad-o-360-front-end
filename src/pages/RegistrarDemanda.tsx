@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Upload, CheckCircle, FileText } from "lucide-react";
 import Modal from "@/components/shared/Modal";
 import api from "../services/api";
 import { toast } from "sonner";
+import { categories } from "@/data/mockData";
 
 const RegistrarDemanda = () => {
   const [formData, setFormData] = useState({
@@ -18,6 +19,12 @@ const RegistrarDemanda = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [protocolo, setProtocolo] = useState("");
+  const [userRole, setUserRole] = useState("");
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    setUserRole(user.role || "");
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -181,6 +188,7 @@ Email: ${formData.email}`;
             </div>
 
             {/* Sector selection removed - defaulting to 'Triagem' */}
+
 
             <div>
               <label htmlFor="assunto" className="label-corporate">

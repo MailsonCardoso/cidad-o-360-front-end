@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FileText, Clock, CheckCircle, AlertCircle, ArrowRight } from "lucide-react";
+import { FileText, Clock, CheckCircle, AlertCircle, ArrowRight, TrendingUp, BarChart as BarChartIcon } from "lucide-react";
 import StatCard from "@/components/shared/StatCard";
 import { getStatusClass } from "@/data/mockData";
 import api from "../../services/api";
@@ -17,6 +17,8 @@ import {
   PieChart,
   Pie,
   Cell,
+  LineChart,
+  Line,
 } from "recharts";
 
 const AdminDashboard = () => {
@@ -24,12 +26,15 @@ const AdminDashboard = () => {
     abertas: 0,
     andamento: 0,
     concluidas: 0,
+    concluidas_mes: 0,
     recentes: [] as any[],
     categorias: [] as any[],
     status_detalhado: [] as any[],
+    ranking_setores: [] as any[],
+    tendencias: [] as any[],
   });
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate(); // Add hook
+  const navigate = useNavigate();
 
   // Colors for charts
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8", "#82ca9d"];
@@ -56,9 +61,12 @@ const AdminDashboard = () => {
             abertas: data.data.abertas,
             andamento: data.data.andamento,
             concluidas: data.data.concluidas,
+            concluidas_mes: data.data.concluidas_mes || 0,
             recentes: data.data.recentes,
             categorias: data.data.categorias || [],
             status_detalhado: data.data.status_detalhado || [],
+            ranking_setores: data.data.ranking_setores || [],
+            tendencias: data.data.tendencias || [],
           });
         }
       } catch (error) {
@@ -82,7 +90,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Demandas Abertas"
           value={stats.abertas}
@@ -98,19 +106,74 @@ const AdminDashboard = () => {
           trend="Em processamento"
         />
         <StatCard
-          title="Concluídas"
+          title="Total Concluídas"
           value={stats.concluidas}
           icon={CheckCircle}
           variant="success"
-          trend="Este mês"
+          trend="Histórico completo"
+        />
+        <StatCard
+          title="Concluídas no Mês"
+          value={stats.concluidas_mes}
+          icon={TrendingUp}
+          variant="primary"
+          trend="Neste mês"
         />
       </div>
 
-      {/* Charts Section */}
+      {/* Charts Section Top */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Trends Chart (Wide) */}
+        <div className="card-corporate lg:col-span-2 h-[400px]">
+          <h2 className="text-lg font-semibold text-foreground mb-6">Tendência de Atendimentos (12 Meses)</h2>
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={stats.tendencias}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="abertas" name="Novas Demandas" stroke="#F59E0B" activeDot={{ r: 8 }} />
+                <Line type="monotone" dataKey="concluidas" name="Concluídas" stroke="#10B981" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Sector Ranking */}
+        <div className="card-corporate h-[400px] flex flex-col">
+          <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+            <BarChartIcon className="w-5 h-5 text-secondary" />
+            Ranking de Setores
+          </h2>
+          <div className="flex-1 overflow-y-auto pr-2 space-y-4">
+            {stats.ranking_setores.map((setor: any, index: number) => (
+              <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <span className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${index < 3 ? 'bg-secondary text-secondary-foreground' : 'bg-muted text-muted-foreground'}`}>
+                    {index + 1}
+                  </span>
+                  <span className="font-medium text-sm">{setor.categoria}</span>
+                </div>
+                <span className="text-sm font-bold text-foreground">{setor.total}</span>
+              </div>
+            ))}
+            {stats.ranking_setores.length === 0 && (
+              <p className="text-center text-muted-foreground text-sm py-4">Sem dados</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Charts Section Bottom */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Categories Chart */}
         <div className="card-corporate h-[400px]">
-          <h2 className="text-lg font-semibold text-foreground mb-6">Demandas por Setor</h2>
+          <h2 className="text-lg font-semibold text-foreground mb-6">Demandas por Setor (Total)</h2>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
@@ -143,8 +206,7 @@ const AdminDashboard = () => {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ status, percent }) => `${status} ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={100}
+                  outerRadius={80}
                   fill="#8884d8"
                   dataKey="total"
                   nameKey="status"
@@ -155,6 +217,7 @@ const AdminDashboard = () => {
                   ))}
                 </Pie>
                 <Tooltip />
+                <Legend />
               </PieChart>
             </ResponsiveContainer>
           </div>

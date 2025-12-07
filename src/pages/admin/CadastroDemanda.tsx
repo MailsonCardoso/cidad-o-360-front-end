@@ -47,7 +47,7 @@ const CadastroDemanda = () => {
                 data.append("arquivo", formData.arquivo);
             }
 
-            const response = await api.post("/demandas", data, {
+            const response = await api.post("/admin/demandas", data, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
 
