@@ -34,6 +34,8 @@ import AdminCadastroDemanda from "@/pages/admin/CadastroDemanda"; // Import new 
 
 const queryClient = new QueryClient();
 
+
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>

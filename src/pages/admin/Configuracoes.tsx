@@ -1,6 +1,13 @@
 import { Settings, User, Bell, Shield, Palette } from "lucide-react";
 
+
 const AdminConfiguracoes = () => {
+  // const { theme, setTheme } = useTheme();
+
+  // const updateTheme = (newTheme: any) => {
+  //   setTheme(newTheme);
+  // };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -119,6 +126,7 @@ const AdminConfiguracoes = () => {
           </h2>
 
           <div className="space-y-4">
+
             <div>
               <label className="label-corporate">Idioma</label>
               <select className="input-corporate">

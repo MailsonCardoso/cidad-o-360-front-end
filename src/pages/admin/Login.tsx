@@ -38,7 +38,9 @@ const AdminLogin = () => {
         }
       }
     } catch (error: any) {
-      console.error(error);
+      console.error("Login Error:", error);
+      console.error("Response Data:", error.response?.data);
+      console.error("Full Response:", error.response);
       toast.error(error.response?.data?.message || "Erro ao realizar login");
     }
   };

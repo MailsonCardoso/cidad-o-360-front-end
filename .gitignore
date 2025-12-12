@@ -22,3 +22,21 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Laravel Backend
+back/vendor/
+back/node_modules/
+back/storage/*.key
+back/storage/framework/cache/*
+back/storage/framework/sessions/*
+back/storage/framework/testing/*
+back/storage/framework/views/*
+back/storage/logs/*
+back/bootstrap/cache/*
+back/.env
+back/.env.backup
+back/.phpunit.result.cache
+back/Homestead.json
+back/Homestead.yaml
+back/npm-debug.log
+back/yarn-error.log
