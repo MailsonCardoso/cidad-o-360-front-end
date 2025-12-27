@@ -233,7 +233,7 @@ const AdminDemandaDetalhe = () => {
                   {anexos.map((anexo: string, index: number) => (
                     <a
                       key={index}
-                      href={`http://127.0.0.1:8000/storage/${anexo}`}
+                      href={`http://192.168.176.30:8000/storage/${anexo}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground hover:border-secondary hover:text-secondary transition-all shadow-sm"
