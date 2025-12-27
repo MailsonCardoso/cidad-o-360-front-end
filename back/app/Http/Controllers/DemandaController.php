@@ -337,7 +337,13 @@ class DemandaController extends Controller
                 ->orderBy('total', 'desc')
                 ->take(5)
                 ->get(),
-            'tendencias' => $last12Months
+            'tendencias' => $last12Months,
+            'media_satisfacao' => Demanda::whereNotNull('satisfacao_nota')->avg('satisfacao_nota') ?? 0,
+            'satisfacao_por_setor' => Demanda::select('categoria', \Illuminate\Support\Facades\DB::raw('avg(satisfacao_nota) as media'), \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+                ->whereNotNull('satisfacao_nota')
+                ->groupBy('categoria')
+                ->orderBy('media', 'desc')
+                ->get(),
         ];
 
         return response()->json([

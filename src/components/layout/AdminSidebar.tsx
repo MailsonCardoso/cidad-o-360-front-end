@@ -12,7 +12,8 @@ import {
   Shield,
   FolderOpen,
   FilePlus,
-  Globe
+  Globe,
+  Star
 } from "lucide-react";
 import { useState } from "react";
 import { categories } from "@/data/mockData";
@@ -33,6 +34,12 @@ const AdminSidebar = () => {
       label: "Dashboard",
       icon: LayoutDashboard,
       visible: isAdmin // Strictly Admin only
+    },
+    {
+      href: "/admin/qualidade",
+      label: "Qualidade",
+      icon: Star,
+      visible: isAdmin
     },
     {
       href: "/admin/demandas",

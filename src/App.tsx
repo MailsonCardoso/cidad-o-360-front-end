@@ -31,6 +31,7 @@ import AdminSegurancaPublica from "@/pages/admin/SegurancaPublica";
 import AdminSetorDemandas from "@/pages/admin/SetorDemandas";
 import AdminChangePassword from "@/pages/admin/ChangePassword";
 import AdminCadastroDemanda from "@/pages/admin/CadastroDemanda"; // Import new page
+import AdminQualidade from "@/pages/admin/Qualidade";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,7 @@ const App = () => (
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="qualidade" element={<AdminQualidade />} />
             <Route path="demandas" element={<AdminDemandas />} />
             <Route path="cadastro" element={<AdminCadastroDemanda />} /> {/* New Route */}
             <Route path="demandas/:id" element={<AdminDemandaDetalhe />} />
