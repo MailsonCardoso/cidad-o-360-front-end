@@ -44,6 +44,7 @@ const RegistrarDemanda = () => {
       const data = new FormData();
       data.append("categoria", "Triagem"); // Default category for public requests
       data.append("assunto", formData.assunto);
+      data.append("cpf", formData.cpf);
 
       // Append contact info to description for guest users
       const fullDescription = `${formData.descricao}

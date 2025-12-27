@@ -6,12 +6,12 @@ import WhatsAppButton from "./WhatsAppButton";
 const PublicLayout = () => {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <div className="print:hidden"><Header /></div>
       <main className="flex-1">
         <Outlet />
       </main>
-      <Footer />
-      <WhatsAppButton />
+      <div className="print:hidden"><Footer /></div>
+      <div className="print:hidden"><WhatsAppButton /></div>
     </div>
   );
 };

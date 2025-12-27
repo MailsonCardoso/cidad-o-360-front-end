@@ -65,6 +65,7 @@ class DemandaController extends Controller
             'categoria' => 'required',
             'assunto' => 'required|string',
             'descricao' => 'required|string',
+            'cpf' => 'nullable|string',
             'arquivo' => 'nullable|file|max:10240', // 10MB
         ]);
 
@@ -99,6 +100,7 @@ class DemandaController extends Controller
             'arquivo' => $path,
             'protocolo' => 'C360-' . date('Ymd') . '-' . strtoupper(str()->random(4)),
             'status' => $initialStatus,
+            'cpf_solicitante' => $validated['cpf'] ?? null,
         ]);
 
         \App\Models\DemandaHistorico::create([
@@ -221,7 +223,7 @@ class DemandaController extends Controller
             'message' => 'Demanda excluída com sucesso'
         ]);
     }
-    public function search($protocolo)
+    public function search(Request $request, $protocolo)
     {
         $demanda = Demanda::with('historico')->where('protocolo', $protocolo)->first();
 
@@ -229,10 +231,59 @@ class DemandaController extends Controller
             return response()->json(['success' => false, 'message' => 'Protocolo não encontrado'], 404);
         }
 
+        // Backend CPF Verification
+        $cpfProvided = $request->query('cpf', '');
+
+        // Remove non-digits for comparison
+        $cpfClean = preg_replace('/\D/', '', $cpfProvided);
+
+        if (empty($cpfClean)) {
+            return response()->json(['success' => false, 'message' => 'CPF é obrigatório para consulta'], 400);
+        }
+
+        // Check against column if exists
+        if ($demanda->cpf_solicitante) {
+            $bankCpfClean = preg_replace('/\D/', '', $demanda->cpf_solicitante);
+            if ($bankCpfClean !== $cpfClean) {
+                return response()->json(['success' => false, 'message' => 'Dados inválidos'], 403);
+            }
+        } else {
+            // Legacy fallback: check description
+            $descriptionClean = preg_replace('/\D/', '', $demanda->descricao);
+            if (!str_contains($descriptionClean, $cpfClean)) {
+                return response()->json(['success' => false, 'message' => 'Dados inválidos'], 403);
+            }
+        }
+
         return response()->json([
             'success' => true,
             'data' => $demanda,
             'message' => 'Demanda encontrada'
+        ]);
+    }
+
+    public function rate(Request $request, $id)
+    {
+        $demanda = Demanda::find($id);
+
+        if (!$demanda) {
+            return response()->json(['success' => false, 'message' => 'Demanda não encontrada'], 404);
+        }
+
+        $validated = $request->validate([
+            'nota' => 'required|integer|min:1|max:5',
+            'comentario' => 'nullable|string|max:500',
+        ]);
+
+        $demanda->update([
+            'satisfacao_nota' => $validated['nota'],
+            'satisfacao_comentario' => $validated['comentario'] ?? null,
+            'satisfacao_data' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Avaliação recebida com sucesso'
         ]);
     }
 

@@ -17,6 +17,10 @@ class Demanda extends Model
         'arquivo',
         'status',
         'protocolo',
+        'satisfacao_nota',
+        'satisfacao_comentario',
+        'satisfacao_data',
+        'cpf_solicitante',
     ];
 
     public function user()
