@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Lock, Save, X } from "lucide-react";
 import api from "../../services/api";
@@ -14,10 +14,46 @@ const ChangePassword = () => {
         confirmPassword: "",
     });
 
+    const [strength, setStrength] = useState(0);
+
+    const calculateStrength = (password: string) => {
+        let score = 0;
+        if (!password) {
+            setStrength(0);
+            return;
+        }
+        if (password.length > 5) score += 1;
+        if (password.length > 7) score += 1;
+        if (/[0-9]/.test(password)) score += 1;
+        if (/[^A-Za-z0-9]/.test(password)) score += 1;
+        setStrength(score);
+    };
+
+    useEffect(() => {
+        calculateStrength(formData.password);
+    }, [formData.password]);
+
+    const getStrengthColor = () => {
+        if (strength === 0) return "bg-gray-200";
+        if (strength <= 2) return "bg-red-500";
+        if (strength === 3) return "bg-yellow-500";
+        return "bg-green-500";
+    };
+
+    const getStrengthText = () => {
+        if (strength === 0) return "";
+        if (strength <= 2) return "Fraca";
+        if (strength === 3) return "Média";
+        return "Forte";
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
+
+    // ... (rest of the file until render)
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -92,6 +128,24 @@ const ChangePassword = () => {
                                 placeholder="******"
                                 minLength={6}
                             />
+                            {/* Password Strength Meter */}
+                            {formData.password && (
+                                <div className="mt-2 text-xs">
+                                    <div className="flex justify-between mb-1">
+                                        <span>Força da senha:</span>
+                                        <span className={`font-semibold ${strength <= 2 ? 'text-red-500' : strength === 3 ? 'text-yellow-500' : 'text-green-500'
+                                            }`}>
+                                            {getStrengthText()}
+                                        </span>
+                                    </div>
+                                    <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                                        <div
+                                            className={`h-full transition-all duration-300 ${getStrengthColor()}`}
+                                            style={{ width: `${(strength / 4) * 100}%` }}
+                                        />
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Confirm Password */}
