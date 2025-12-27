@@ -154,14 +154,6 @@ const AdminSidebar = () => {
 
         {/* Footer Actions */}
         <div className="p-4 border-t border-[#1e3a52] space-y-2 bg-[#0a1a29]/30">
-          <Link
-            to="/"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-blue-100 hover:bg-white/10 hover:text-white transition-colors"
-          >
-            <Globe className="w-4 h-4" />
-            Site Público
-          </Link>
-
           <button
             onClick={() => {
               localStorage.removeItem("token");
