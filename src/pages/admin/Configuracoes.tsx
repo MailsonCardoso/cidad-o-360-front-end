@@ -4,6 +4,7 @@ import api from "../../services/api";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const AdminConfiguracoes = () => {
   const [loading, setLoading] = useState(true);
@@ -158,7 +159,61 @@ const AdminConfiguracoes = () => {
       .substring(0, 2);
   };
 
-  if (loading) return <div className="p-8">Carregando...</div>;
+  if (loading) {
+    return (
+      <div className="space-y-6 animate-fade-in">
+        <div className="space-y-2">
+          <Skeleton className="h-10 w-48" />
+          <Skeleton className="h-4 w-96" />
+        </div>
+
+        <div className="w-full">
+          <Skeleton className="h-10 w-[400px] mb-6" /> {/* Tabs List */}
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Profile Card Skeleton */}
+            <div className="card-corporate h-[400px] space-y-6">
+              <div className="flex justify-between">
+                <Skeleton className="h-6 w-24" />
+              </div>
+              <div className="flex flex-col items-center space-y-4">
+                <Skeleton className="h-24 w-24 rounded-full" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+                <Skeleton className="h-10 w-full" />
+              </div>
+            </div>
+
+            {/* Security Card Skeleton */}
+            <div className="card-corporate h-[400px] space-y-6">
+              <Skeleton className="h-6 w-28 mb-6" />
+              <Skeleton className="h-12 w-full mb-4" /> {/* Alert */}
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+                <Skeleton className="h-10 w-full" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-fade-in">
