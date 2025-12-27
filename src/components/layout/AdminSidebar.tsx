@@ -67,29 +67,29 @@ const AdminSidebar = () => {
     <>
       {/* Mobile Toggle */}
       <button
-        className="lg:hidden fixed top-4 right-4 z-50 p-2 bg-sidebar-background text-sidebar-foreground rounded-lg shadow-lg"
+        className="lg:hidden fixed top-4 right-4 z-50 p-2 bg-background border border-border rounded-lg shadow-sm"
         onClick={() => setIsOpen(!isOpen)}
       >
-        {isOpen ? <X /> : <Menu />}
+        {isOpen ? <X className="text-foreground" /> : <Menu className="text-foreground" />}
       </button>
 
       {/* Sidebar Container */}
       <aside className={`
         fixed lg:static inset-y-0 left-0 z-40
-        w-64 bg-sidebar-background text-sidebar-foreground
+        w-64 bg-card border-r border-border
         transform transition-transform duration-200 ease-in-out
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         flex flex-col
       `}>
         {/* Logo Area */}
-        <div className="p-6 border-b border-sidebar-border/50">
+        <div className="p-6 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-sidebar-primary flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-sidebar-primary-foreground" />
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Building2 className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h1 className="font-bold text-lg leading-none">Cidadão 360</h1>
-              <span className="text-xs text-sidebar-foreground/60">Painel Administrativo</span>
+              <h1 className="font-bold text-lg leading-none text-foreground">Cidadão 360</h1>
+              <span className="text-xs text-muted-foreground">Painel Administrativo</span>
             </div>
           </div>
         </div>
@@ -101,7 +101,7 @@ const AdminSidebar = () => {
           {menuGroups.map((group, groupIndex) => (
             group.items.some(item => item.visible) && (
               <div key={groupIndex}>
-                <h3 className="px-4 text-xs font-semibold text-sidebar-foreground/40 uppercase tracking-wider mb-2">
+                <h3 className="px-4 text-xs font-semibold text-muted-foreground/70 uppercase tracking-wider mb-2">
                   {group.title}
                 </h3>
                 <nav className="space-y-1">
@@ -113,11 +113,11 @@ const AdminSidebar = () => {
                       className={`
                         flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors
                         ${isActive(item.href)
-                          ? "bg-sidebar-accent text-white shadow-sm"
-                          : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-white"}
+                          ? "bg-primary/10 text-primary shadow-sm"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"}
                       `}
                     >
-                      <item.icon className={`w-4 h-4 ${isActive(item.href) ? "text-sidebar-primary" : ""}`} />
+                      <item.icon className={`w-4 h-4 ${isActive(item.href) ? "text-primary" : "text-muted-foreground"}`} />
                       {item.label}
                     </Link>
                   ))}
@@ -129,7 +129,7 @@ const AdminSidebar = () => {
           {/* Sectors Section */}
           {(isAdmin || user.setor) && (
             <div>
-              <h3 className="px-4 text-xs font-semibold text-sidebar-foreground/40 uppercase tracking-wider mb-2">
+              <h3 className="px-4 text-xs font-semibold text-muted-foreground/70 uppercase tracking-wider mb-2">
                 ÁREAS / SETORES
               </h3>
               <nav className="space-y-1">
@@ -141,8 +141,8 @@ const AdminSidebar = () => {
                     className={`
                       flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors
                       ${isActive(item.href)
-                        ? "bg-sidebar-accent text-white shadow-sm"
-                        : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-white"}
+                        ? "bg-primary/10 text-primary shadow-sm"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"}
                     `}
                   >
                     <item.icon className="w-4 h-4 opacity-70" />
@@ -155,11 +155,11 @@ const AdminSidebar = () => {
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 border-t border-sidebar-border/50 space-y-2 bg-sidebar-background/50">
+        <div className="p-4 border-t border-border space-y-2 bg-muted/30">
           <Link
             to="/"
             onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-white transition-colors"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
           >
             <Globe className="w-4 h-4" />
             Site Público
@@ -171,7 +171,7 @@ const AdminSidebar = () => {
               localStorage.removeItem("user");
               window.location.href = "/admin/login";
             }}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors"
           >
             <LogOut className="w-4 h-4" />
             Sair do Sistema
