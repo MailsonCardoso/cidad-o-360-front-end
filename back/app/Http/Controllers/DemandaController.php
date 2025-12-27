@@ -134,59 +134,70 @@ class DemandaController extends Controller
         }
 
         $validated = $request->validate([
-            // Allow any status starting with "Encaminhada para" or standard ones
             'status' => 'nullable|string',
             'descricao' => 'nullable|string',
+            'observacao' => 'nullable|string',
         ]);
 
         $oldStatus = $demanda->status;
+        $observacao = $request->input('observacao', '');
+        $statusAlterado = isset($validated['status']) && $validated['status'] !== $oldStatus;
 
-        // Forwarding Logic
-        // Forwarding Logic - Generic
+        // 1. Lógica de Encaminhamento
         if (isset($validated['status']) && str_starts_with($validated['status'], 'Encaminhada para ')) {
-            // Extract sector name from status string "Encaminhada para [Setor]"
             $targetSector = str_replace('Encaminhada para ', '', $validated['status']);
-
             $demanda->categoria = $targetSector;
 
-            // Auto-log for forwarding
+            $descricaoHistorico = "Demanda encaminhada para o setor {$targetSector}.";
+            if (!empty($observacao)) {
+                $descricaoHistorico .= " Justificativa: {$observacao}";
+            }
+
             \App\Models\DemandaHistorico::create([
                 'demanda_id' => $demanda->id,
                 'user_id' => $request->user()?->id,
                 'status' => 'Encaminhamento',
-                'descricao' => "Demanda encaminhada para o setor {$targetSector}",
+                'descricao' => $descricaoHistorico,
             ]);
         }
+        // 2. Lógica de Mudança de Status Padrão OU Apenas Observação
+        elseif ($statusAlterado || !empty($observacao)) {
+            $novoStatus = $validated['status'] ?? $oldStatus;
 
-        $demanda->update($validated);
-
-        if (isset($validated['status']) && $validated['status'] !== $oldStatus && !str_starts_with($validated['status'], 'Encaminhada para ')) {
-            // $userName = $request->user() ? $request->user()->name : "Sistema"; // Removed from text
-            $observacao = $request->input('observacao', '');
-
-            // Generate user-friendly message
-            if (str_starts_with($oldStatus, 'Encaminhada para ') && $validated['status'] === 'Em andamento') {
-                $setor = str_replace('Encaminhada para ', '', $oldStatus);
-                $descricaoHistorico = "O setor {$setor} iniciou o atendimento da sua demanda.";
-            } elseif ($validated['status'] === 'Concluído') {
-                $descricaoHistorico = "O atendimento da sua demanda foi concluído com sucesso.";
-            } elseif ($validated['status'] === 'Em andamento') {
-                $descricaoHistorico = "O atendimento da sua demanda foi iniciado.";
+            if ($statusAlterado) {
+                // Gerar mensagem amigável baseada na mudança de status
+                if (str_starts_with($oldStatus, 'Encaminhada para ') && $novoStatus === 'Em andamento') {
+                    $setor = str_replace('Encaminhada para ', '', $oldStatus);
+                    $descricaoHistorico = "O setor {$setor} iniciou o atendimento da sua demanda.";
+                } elseif ($novoStatus === 'Concluído') {
+                    $descricaoHistorico = "O atendimento da sua demanda foi concluído com sucesso.";
+                } elseif ($novoStatus === 'Em andamento') {
+                    $descricaoHistorico = "O atendimento da sua demanda foi iniciado.";
+                } else {
+                    $descricaoHistorico = "O status da demanda foi atualizado para '{$novoStatus}'.";
+                }
             } else {
-                $descricaoHistorico = "O status da demanda foi atualizado para '{$validated['status']}'.";
+                // Apenas uma observação sem mudar o status
+                $descricaoHistorico = "Atualização / Nota Interna";
             }
 
             if (!empty($observacao)) {
-                $descricaoHistorico .= " Observação: {$observacao}";
+                if ($statusAlterado) {
+                    $descricaoHistorico .= " Observação: {$observacao}";
+                } else {
+                    $descricaoHistorico = $observacao; // Se for só nota, a nota é a descrição principal
+                }
             }
 
             \App\Models\DemandaHistorico::create([
                 'demanda_id' => $demanda->id,
                 'user_id' => $request->user()?->id,
-                'status' => $validated['status'],
+                'status' => $statusAlterado ? $novoStatus : "Atualização",
                 'descricao' => $descricaoHistorico,
             ]);
         }
+
+        $demanda->update($validated);
 
         return response()->json([
             'success' => true,
