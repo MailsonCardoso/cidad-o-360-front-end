@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Users as UsersIcon, Plus, Search, Edit, Trash2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import api from "../../services/api";
 import { toast } from "sonner";
 
@@ -102,9 +103,25 @@ const Users = () => {
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr>
-                                    <td colSpan={5} className="text-center py-8">Carregando...</td>
-                                </tr>
+                                [...Array(5)].map((_, i) => (
+                                    <tr key={i}>
+                                        <td className="py-4">
+                                            <Skeleton className="h-4 w-32" />
+                                        </td>
+                                        <td className="py-4">
+                                            <Skeleton className="h-4 w-48" />
+                                        </td>
+                                        <td className="py-4">
+                                            <Skeleton className="h-6 w-24 rounded-full" />
+                                        </td>
+                                        <td className="py-4 text-right">
+                                            <div className="flex justify-end gap-2">
+                                                <Skeleton className="h-8 w-8 rounded-md" />
+                                                <Skeleton className="h-8 w-8 rounded-md" />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
                             ) : filteredUsers.length === 0 ? (
                                 <tr>
                                     <td colSpan={5} className="text-center py-8 text-muted-foreground">Nenhum usuário encontrado.</td>
