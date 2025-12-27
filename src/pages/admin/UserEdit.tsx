@@ -4,6 +4,14 @@ import { UserCog, Save, X } from "lucide-react";
 import api from "../../services/api";
 import { toast } from "sonner";
 import { categories } from "@/data/mockData";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 const UserEdit = () => {
     const { id } = useParams();
@@ -152,6 +160,27 @@ const UserEdit = () => {
 
     return (
         <div className="space-y-6 animate-fade-in">
+            {/* Breadcrumb */}
+            <Breadcrumb>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link to="/admin/dashboard">Dashboard</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link to="/admin/usuarios">Usuários</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>Editar Usuário</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
+
             {/* Header */}
             <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-foreground flex items-center gap-3">
