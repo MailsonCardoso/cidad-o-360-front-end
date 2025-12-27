@@ -102,23 +102,23 @@ const AdminSidebar = () => {
           {mainGroups.map((group, groupIndex) => (
             group.items.some(item => item.visible) && (
               <div key={groupIndex}>
-                <h3 className="px-4 text-xs font-semibold text-blue-300/70 uppercase tracking-wider mb-2">
+                <h3 className="px-4 text-xs font-bold text-blue-300/80 uppercase tracking-widest mb-3 mt-2">
                   {group.title}
                 </h3>
-                <nav className="space-y-1">
+                <nav className="space-y-1.5">
                   {group.items.filter(item => item.visible).map((item) => (
                     <Link
                       key={item.href}
                       to={item.href}
                       onClick={() => setIsOpen(false)}
                       className={`
-                        flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+                        flex items-center gap-3 px-4 py-3 rounded-lg text-[15px] font-medium transition-all duration-200
                         ${isActive(item.href)
                           ? "bg-white/20 text-white shadow-lg backdrop-blur-sm"
                           : "text-blue-100 hover:bg-white/10 hover:text-white hover:translate-x-1"}
                       `}
                     >
-                      <item.icon className={`w-4 h-4 ${isActive(item.href) ? "text-white" : "text-blue-200"}`} />
+                      <item.icon className={`w-[18px] h-[18px] ${isActive(item.href) ? "text-white" : "text-blue-200"}`} />
                       {item.label}
                     </Link>
                   ))}
@@ -130,23 +130,23 @@ const AdminSidebar = () => {
           {/* Sectors Section */}
           {(isAdmin || user.setor) && (
             <div>
-              <h3 className="px-4 text-xs font-semibold text-blue-300/70 uppercase tracking-wider mb-2">
+              <h3 className="px-4 text-xs font-bold text-blue-300/80 uppercase tracking-widest mb-3 mt-4">
                 ÁREAS / SETORES
               </h3>
-              <nav className="space-y-1">
+              <nav className="space-y-1.5">
                 {sectorLinks.filter(item => item.visible).map((item) => (
                   <Link
                     key={item.href}
                     to={item.href}
                     onClick={() => setIsOpen(false)}
                     className={`
-                      flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+                      flex items-center gap-3 px-4 py-3 rounded-lg text-[15px] font-medium transition-all duration-200
                       ${isActive(item.href)
                         ? "bg-white/20 text-white shadow-lg backdrop-blur-sm"
                         : "text-blue-100 hover:bg-white/10 hover:text-white hover:translate-x-1"}
                     `}
                   >
-                    <item.icon className="w-4 h-4 opacity-70 text-blue-200" />
+                    <item.icon className="w-[18px] h-[18px] opacity-70 text-blue-200" />
                     {item.label}
                   </Link>
                 ))}
@@ -157,23 +157,23 @@ const AdminSidebar = () => {
           {/* System Group */}
           {systemGroup.items.some(item => item.visible) && (
             <div>
-              <h3 className="px-4 text-xs font-semibold text-blue-300/70 uppercase tracking-wider mb-2">
+              <h3 className="px-4 text-xs font-bold text-blue-300/80 uppercase tracking-widest mb-3 mt-4">
                 {systemGroup.title}
               </h3>
-              <nav className="space-y-1">
+              <nav className="space-y-1.5">
                 {systemGroup.items.filter(item => item.visible).map((item) => (
                   <Link
                     key={item.href}
                     to={item.href}
                     onClick={() => setIsOpen(false)}
                     className={`
-                      flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+                      flex items-center gap-3 px-4 py-3 rounded-lg text-[15px] font-medium transition-all duration-200
                       ${isActive(item.href)
                         ? "bg-white/20 text-white shadow-lg backdrop-blur-sm"
                         : "text-blue-100 hover:bg-white/10 hover:text-white hover:translate-x-1"}
                     `}
                   >
-                    <item.icon className={`w-4 h-4 ${isActive(item.href) ? "text-white" : "text-blue-200"}`} />
+                    <item.icon className={`w-[18px] h-[18px] ${isActive(item.href) ? "text-white" : "text-blue-200"}`} />
                     {item.label}
                   </Link>
                 ))}
