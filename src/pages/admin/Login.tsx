@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Building2, Lock, Mail } from "lucide-react";
+import { Building2, Lock, Mail, ArrowLeft } from "lucide-react";
 import api from "../../services/api";
 import { toast } from "sonner";
 
@@ -46,7 +46,15 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-muted flex items-center justify-center p-4">
+    <div className="min-h-screen bg-muted flex items-center justify-center p-4 relative">
+      <button
+        onClick={() => navigate("/")}
+        className="absolute top-4 left-4 flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-border text-sm text-muted-foreground hover:text-primary hover:border-primary transition-all shadow-sm group"
+      >
+        <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+        Voltar ao site público
+      </button>
+
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
@@ -105,19 +113,10 @@ const AdminLogin = () => {
             </button>
           </form>
 
-          <div className="mt-4 flex flex-col gap-2 text-center">
+          <div className="mt-4 text-center">
             <a href="#" className="text-sm text-secondary hover:underline">
               Esqueceu a senha?
             </a>
-            <div className="pt-2 border-t border-border mt-2">
-              <button
-                onClick={() => navigate("/")}
-                className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center justify-center gap-1"
-              >
-                <Building2 className="w-4 h-4" />
-                Voltar ao site público
-              </button>
-            </div>
           </div>
         </div>
 
