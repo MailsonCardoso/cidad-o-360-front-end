@@ -11,7 +11,8 @@ import {
   Users as UsersIcon,
   Shield,
   FolderOpen,
-  FilePlus
+  FilePlus,
+  Globe
 } from "lucide-react";
 import { useState } from "react";
 import { categories } from "@/data/mockData";
@@ -127,8 +128,15 @@ const AdminSidebar = () => {
             ))}
           </nav>
 
-          {/* Logout */}
-          <div className="p-4 border-t border-sidebar-border">
+          {/* Public Site & Logout */}
+          <div className="p-4 border-t border-sidebar-border space-y-1">
+            <Link
+              to="/"
+              className="sidebar-item hover:bg-primary/10 text-primary"
+            >
+              <Globe className="w-5 h-5" />
+              <span>Site Público</span>
+            </Link>
             <Link
               to="/admin/login"
               onClick={() => {

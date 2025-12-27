@@ -105,10 +105,19 @@ const AdminLogin = () => {
             </button>
           </form>
 
-          <div className="mt-4 text-center">
+          <div className="mt-4 flex flex-col gap-2 text-center">
             <a href="#" className="text-sm text-secondary hover:underline">
               Esqueceu a senha?
             </a>
+            <div className="pt-2 border-t border-border mt-2">
+              <button
+                onClick={() => navigate("/")}
+                className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center justify-center gap-1"
+              >
+                <Building2 className="w-4 h-4" />
+                Voltar ao site público
+              </button>
+            </div>
           </div>
         </div>
 
