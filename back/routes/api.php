@@ -10,6 +10,7 @@ use App\Http\Controllers\UserController;
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/demandas', [DemandaController::class, 'store']); // Public creation endpoint
 Route::get('/consultar/{protocolo}', [DemandaController::class, 'search']); // Public search endpoint
+Route::post('/demandas/{id}/rate', [DemandaController::class, 'rate']); // Public rating endpoint
 
 // Public Comunicados routes
 Route::get('/comunicados', [ComunicadoController::class, 'index']);

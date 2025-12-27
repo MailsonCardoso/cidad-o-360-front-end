@@ -215,9 +215,11 @@ const ConsultarProtocolo = () => {
                         key={star}
                         type="button"
                         onClick={() => setRating(star)}
-                        className={`transition-all hover:scale-110 ${rating >= star ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+                        className="transition-all hover:scale-110 focus:outline-none"
                       >
-                        <Star className="w-8 h-8" />
+                        <Star
+                          className={`w-8 h-8 ${rating >= star ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+                        />
                       </button>
                     ))}
                   </div>
