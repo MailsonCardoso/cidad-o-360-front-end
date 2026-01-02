@@ -66,7 +66,7 @@ const AdminSidebar = () => {
 
   // Foreground styles
   const sidebarStyles = {
-    backgroundColor: 'var(--sidebar-background)',
+    backgroundColor: 'hsl(var(--sidebar-background))',
     color: 'hsl(var(--sidebar-foreground))'
   };
 
