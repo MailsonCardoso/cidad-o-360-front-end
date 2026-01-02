@@ -38,6 +38,7 @@ class ThemeController extends Controller
      */
     public function update(Request $request)
     {
+        \Log::info('Theme update attempt', $request->all());
         // Validate
         $validated = $request->validate([
             'theme_primary_color' => 'required|string|regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/',

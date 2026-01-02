@@ -78,9 +78,10 @@ const AdminConfiguracoes = () => {
       await themeService.updateTheme(themeSettings);
       toast.success("Tema global atualizado com sucesso!");
       queryClient.invalidateQueries({ queryKey: ['globalTheme'] });
-    } catch (error) {
-      console.error(error);
-      toast.error("Erro ao salvar tema global");
+    } catch (error: any) {
+      console.error("Erro ao salvar tema global:", error);
+      const message = error.response?.data?.message || "Erro ao salvar tema global";
+      toast.error(message);
     } finally {
       setSavingTheme(false);
     }

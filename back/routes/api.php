@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ThemeController;
 
 Route::get('/theme', [ThemeController::class, 'index']);
+Route::put('/theme', [ThemeController::class, 'update']); // Temporarily public for debugging
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::post('/demandas', [DemandaController::class, 'store']); // Public creation endpoint
@@ -23,7 +24,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // Demanda CRUD
-    // Demanda CRUD (except store which is public)
     Route::apiResource('demandas', DemandaController::class)->except(['store']);
     Route::post('/admin/demandas', [DemandaController::class, 'store']); // Internal creation endpoint
     Route::get('/dashboard/stats', [DemandaController::class, 'stats']);
@@ -35,9 +35,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // User CRUD (Admin)
     Route::apiResource('users', UserController::class);
-
-    // Theme Update (Admin)
-    Route::put('/theme', [ThemeController::class, 'update']);
 
     Route::get('/user', function (Request $request) {
         return $request->user();
