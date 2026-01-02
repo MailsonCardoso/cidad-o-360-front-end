@@ -558,7 +558,7 @@ const AdminConfiguracoes = () => {
                     theme_secondary_color: '#475569',
                     theme_accent_color: '#10B981',
                     theme_background_color: '#F1F5F9',
-                    theme_sidebar_color: '#FFFFFF',
+                    theme_sidebar_color: '#0F172A',
                   }
                 },
                 {

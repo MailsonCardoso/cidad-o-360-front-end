@@ -35,26 +35,6 @@ const hexToHSLForTailwind = (hex: string): string => {
     return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
 };
 
-// Helper to determine if a color is light or dark to set foreground
-const getContrastColor = (hex: string): string => {
-    let r, g, b;
-    if (hex.length === 4) {
-        r = parseInt(hex[1] + hex[1], 16);
-        g = parseInt(hex[2] + hex[2], 16);
-        b = parseInt(hex[3] + hex[3], 16);
-    } else {
-        r = parseInt(hex.substring(1, 3), 16);
-        g = parseInt(hex.substring(3, 5), 16);
-        b = parseInt(hex.substring(5, 7), 16);
-    }
-
-    // YIQ luminance formula
-    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-    // If luminance > 128, color is light, use dark foreground. Else use white.
-    // Returning HSL for consistency with Tailwind vars
-    return yiq >= 128 ? "215 25% 15%" : "0 0% 100%";
-};
-
 const ThemeManager = () => {
     const { data: theme } = useQuery({
         queryKey: ['globalTheme'],
@@ -81,9 +61,10 @@ const ThemeManager = () => {
                 }
                 if (theme.theme_sidebar_color) {
                     root.style.setProperty('--sidebar-background', hexToHSLForTailwind(theme.theme_sidebar_color));
-                    // Set sidebar foreground based on background brightness
-                    root.style.setProperty('--sidebar-foreground', getContrastColor(theme.theme_sidebar_color));
                 }
+
+                // Forçar letras brancas na sidebar conforme solicitado
+                root.style.setProperty('--sidebar-foreground', "0 0% 100%");
             } catch (err) {
                 console.error("Erro ao aplicar cores do tema:", err);
             }
