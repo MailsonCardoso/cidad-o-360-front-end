@@ -64,33 +64,43 @@ const AdminSidebar = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  // Foreground styles
+  const sidebarStyles = {
+    backgroundColor: 'var(--sidebar-background)',
+    color: 'hsl(var(--sidebar-foreground))'
+  };
+
   return (
     <>
       {/* Mobile Toggle */}
       <button
-        className="lg:hidden fixed top-4 right-4 z-50 p-2 bg-[#0f2537] text-white rounded-lg shadow-sm"
+        className="lg:hidden fixed top-4 right-4 z-50 p-2 rounded-lg shadow-sm"
+        style={sidebarStyles}
         onClick={() => setIsOpen(!isOpen)}
       >
         {isOpen ? <X /> : <Menu />}
       </button>
 
       {/* Sidebar Container */}
-      <aside className={`
-        fixed lg:static inset-y-0 left-0 z-40
-        w-64 bg-[#0f2537] text-white border-r border-[#1e3a52]
-        transform transition-transform duration-200 ease-in-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-        flex flex-col
-      `}>
+      <aside
+        className={`
+          fixed lg:static inset-y-0 left-0 z-40
+          w-64 border-r border-white/10
+          transform transition-transform duration-200 ease-in-out
+          ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+          flex flex-col
+        `}
+        style={sidebarStyles}
+      >
         {/* Logo Area */}
-        <div className="p-6 border-b border-[#1e3a52]">
+        <div className="p-6 border-b border-white/10">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 rounded-lg bg-current/10 flex items-center justify-center">
+              <Building2 className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="font-bold text-lg leading-none text-white">Cidadão 360</h1>
-              <span className="text-xs text-blue-200">Painel Administrativo</span>
+              <h1 className="font-bold text-lg leading-none">Cidadão 360</h1>
+              <span className="text-xs opacity-70">Painel Administrativo</span>
             </div>
           </div>
         </div>
@@ -102,7 +112,7 @@ const AdminSidebar = () => {
           {mainGroups.map((group, groupIndex) => (
             group.items.some(item => item.visible) && (
               <div key={groupIndex}>
-                <h3 className="px-4 text-xs font-bold text-blue-300/80 uppercase tracking-widest mb-3 mt-2">
+                <h3 className="px-4 text-xs font-bold uppercase tracking-widest mb-3 mt-2 opacity-60">
                   {group.title}
                 </h3>
                 <nav className="space-y-1.5">
@@ -114,11 +124,11 @@ const AdminSidebar = () => {
                       className={`
                         flex items-center gap-3 px-4 py-3 rounded-lg text-[15px] font-medium transition-all duration-200
                         ${isActive(item.href)
-                          ? "bg-white/20 text-white shadow-lg backdrop-blur-sm"
-                          : "text-blue-100 hover:bg-white/10 hover:text-white hover:translate-x-1"}
+                          ? "bg-current/20 shadow-lg backdrop-blur-sm"
+                          : "opacity-80 hover:bg-current/10 hover:opacity-100 hover:translate-x-1"}
                       `}
                     >
-                      <item.icon className={`w-[18px] h-[18px] ${isActive(item.href) ? "text-white" : "text-blue-200"}`} />
+                      <item.icon className="w-[18px] h-[18px]" />
                       {item.label}
                     </Link>
                   ))}
@@ -130,7 +140,7 @@ const AdminSidebar = () => {
           {/* Sectors Section */}
           {(isAdmin || user.setor) && (
             <div>
-              <h3 className="px-4 text-xs font-bold text-blue-300/80 uppercase tracking-widest mb-3 mt-4">
+              <h3 className="px-4 text-xs font-bold uppercase tracking-widest mb-3 mt-4 opacity-60">
                 ÁREAS / SETORES
               </h3>
               <nav className="space-y-1.5">
@@ -142,11 +152,11 @@ const AdminSidebar = () => {
                     className={`
                       flex items-center gap-3 px-4 py-3 rounded-lg text-[15px] font-medium transition-all duration-200
                       ${isActive(item.href)
-                        ? "bg-white/20 text-white shadow-lg backdrop-blur-sm"
-                        : "text-blue-100 hover:bg-white/10 hover:text-white hover:translate-x-1"}
+                        ? "bg-current/20 shadow-lg backdrop-blur-sm"
+                        : "opacity-80 hover:bg-current/10 hover:opacity-100 hover:translate-x-1"}
                     `}
                   >
-                    <item.icon className="w-[18px] h-[18px] opacity-70 text-blue-200" />
+                    <item.icon className="w-[18px] h-[18px]" />
                     {item.label}
                   </Link>
                 ))}
@@ -157,7 +167,7 @@ const AdminSidebar = () => {
           {/* System Group */}
           {systemGroup.items.some(item => item.visible) && (
             <div>
-              <h3 className="px-4 text-xs font-bold text-blue-300/80 uppercase tracking-widest mb-3 mt-4">
+              <h3 className="px-4 text-xs font-bold uppercase tracking-widest mb-3 mt-4 opacity-60">
                 {systemGroup.title}
               </h3>
               <nav className="space-y-1.5">
@@ -169,11 +179,11 @@ const AdminSidebar = () => {
                     className={`
                       flex items-center gap-3 px-4 py-3 rounded-lg text-[15px] font-medium transition-all duration-200
                       ${isActive(item.href)
-                        ? "bg-white/20 text-white shadow-lg backdrop-blur-sm"
-                        : "text-blue-100 hover:bg-white/10 hover:text-white hover:translate-x-1"}
+                        ? "bg-current/20 shadow-lg backdrop-blur-sm"
+                        : "opacity-80 hover:bg-current/10 hover:opacity-100 hover:translate-x-1"}
                     `}
                   >
-                    <item.icon className={`w-[18px] h-[18px] ${isActive(item.href) ? "text-white" : "text-blue-200"}`} />
+                    <item.icon className="w-[18px] h-[18px]" />
                     {item.label}
                   </Link>
                 ))}
@@ -183,14 +193,14 @@ const AdminSidebar = () => {
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 border-t border-[#1e3a52] space-y-2 bg-[#0a1a29]/30">
+        <div className="p-4 border-t border-white/10 space-y-2 bg-black/10">
           <button
             onClick={() => {
               localStorage.removeItem("token");
               localStorage.removeItem("user");
               window.location.href = "/admin/login";
             }}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-red-300 hover:bg-red-500/20 hover:text-red-200 transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-red-500/20 transition-colors"
           >
             <LogOut className="w-4 h-4" />
             Sair do Sistema
