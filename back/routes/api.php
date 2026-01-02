@@ -9,7 +9,6 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ThemeController;
 
 Route::get('/theme', [ThemeController::class, 'index']);
-Route::put('/theme', [ThemeController::class, 'update']); // Temporarily public for debugging
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::post('/demandas', [DemandaController::class, 'store']); // Public creation endpoint
@@ -35,6 +34,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // User CRUD (Admin)
     Route::apiResource('users', UserController::class);
+
+    // Theme Update (Admin)
+    Route::put('/theme', [ThemeController::class, 'update']);
 
     Route::get('/user', function (Request $request) {
         return $request->user();
