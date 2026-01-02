@@ -506,133 +506,174 @@ const AdminConfiguracoes = () => {
                 Tema Global do Sistema
               </h2>
               <p className="text-sm text-muted-foreground">
-                Altere a identidade visual para todos os usuários do sistema.
+                Selecione uma das paletas profissionais abaixo para aplicar a todos os usuários.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <div className="space-y-2">
-                <label className="label-corporate">Cor Primária</label>
-                <div className="flex gap-3 items-center">
-                  <input
-                    type="color"
-                    value={themeSettings.theme_primary_color}
-                    onChange={(e) => setThemeSettings({ ...themeSettings, theme_primary_color: e.target.value })}
-                    className="h-12 w-20 rounded border border-border cursor-pointer"
-                  />
-                  <input
-                    type="text"
-                    value={themeSettings.theme_primary_color}
-                    onChange={(e) => setThemeSettings({ ...themeSettings, theme_primary_color: e.target.value })}
-                    className="input-corporate"
-                  />
-                </div>
+            {/* Grid de Paletas */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+              {[
+                {
+                  id: 'oceanic',
+                  name: 'Oceanic Corporate',
+                  description: 'Confiança e sobriedade para gestão pública.',
+                  colors: {
+                    theme_primary_color: '#2563EB',
+                    theme_secondary_color: '#64748B',
+                    theme_accent_color: '#F59E0B',
+                    theme_background_color: '#F8FAFC',
+                    theme_sidebar_color: '#0F172A',
+                  }
+                },
+                {
+                  id: 'tech',
+                  name: 'Tech Indigo',
+                  description: 'Vibrante, moderno e focado em tecnologia.',
+                  colors: {
+                    theme_primary_color: '#6366F1',
+                    theme_secondary_color: '#94A3B8',
+                    theme_accent_color: '#EC4899',
+                    theme_background_color: '#F1F5F9',
+                    theme_sidebar_color: '#1E1B4B',
+                  }
+                },
+                {
+                  id: 'emerald',
+                  name: 'Emerald Eco',
+                  description: 'Vitalidade e transparência sustentável.',
+                  colors: {
+                    theme_primary_color: '#059669',
+                    theme_secondary_color: '#6B7280',
+                    theme_accent_color: '#8B5CF6',
+                    theme_background_color: '#F9FAFB',
+                    theme_sidebar_color: '#064E3B',
+                  }
+                },
+                {
+                  id: 'minimalist',
+                  name: 'Slate Minimalist',
+                  description: 'Extremamente arejado com sidebar branca.',
+                  colors: {
+                    theme_primary_color: '#0F172A',
+                    theme_secondary_color: '#475569',
+                    theme_accent_color: '#10B981',
+                    theme_background_color: '#F1F5F9',
+                    theme_sidebar_color: '#FFFFFF',
+                  }
+                },
+                {
+                  id: 'bordeaux',
+                  name: 'Bordeaux Executive',
+                  description: 'Sofisticação e tradição executiva.',
+                  colors: {
+                    theme_primary_color: '#991B1B',
+                    theme_secondary_color: '#525252',
+                    theme_accent_color: '#D97706',
+                    theme_background_color: '#FAFAFA',
+                    theme_sidebar_color: '#450A0A',
+                  }
+                }
+              ].map((theme) => {
+                const isSelected =
+                  themeSettings.theme_primary_color.toUpperCase() === theme.colors.theme_primary_color.toUpperCase() &&
+                  themeSettings.theme_sidebar_color.toUpperCase() === theme.colors.theme_sidebar_color.toUpperCase();
+
+                return (
+                  <div
+                    key={theme.id}
+                    onClick={() => setThemeSettings(theme.colors)}
+                    className={`cursor-pointer group relative p-4 rounded-xl border-2 transition-all duration-300 hover:shadow-lg ${isSelected
+                      ? 'border-primary bg-primary/5 ring-1 ring-primary/20'
+                      : 'border-transparent bg-muted/10 hover:bg-muted/20'
+                      }`}
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className={`font-bold transition-colors ${isSelected ? 'text-primary' : 'text-foreground'}`}>
+                        {theme.name}
+                      </h3>
+                      {isSelected && (
+                        <div className="w-5 h-5 bg-primary text-white rounded-full flex items-center justify-center animate-scale-in">
+                          <svg className="w-3 h-3 fill-current" viewBox="0 0 20 20"><path d="M0 11l2-2 5 5L18 3l2 2L7 18z" /></svg>
+                        </div>
+                      )}
+                    </div>
+
+                    <p className="text-xs text-muted-foreground mb-4 line-clamp-2">
+                      {theme.description}
+                    </p>
+
+                    <div className="flex items-center gap-1.5 p-2 bg-background/50 rounded-lg border border-border/50">
+                      <div className="w-6 h-6 rounded shadow-sm" style={{ backgroundColor: theme.colors.theme_primary_color }} title="Primária" />
+                      <div className="w-6 h-6 rounded shadow-sm" style={{ backgroundColor: theme.colors.theme_secondary_color }} title="Secundária" />
+                      <div className="w-6 h-6 rounded shadow-sm" style={{ backgroundColor: theme.colors.theme_accent_color }} title="Destaque" />
+                      <div className="w-6 h-6 rounded shadow-sm border border-border" style={{ backgroundColor: theme.colors.theme_background_color }} title="Fundo" />
+                      <div className="w-6 h-6 rounded shadow-sm" style={{ backgroundColor: theme.colors.theme_sidebar_color }} title="Sidebar" />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="mt-10 p-8 rounded-2xl border border-dashed border-border bg-muted/5">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-2 h-8 bg-primary rounded-full" />
+                <h3 className="font-semibold text-lg text-foreground">Pré-visualização da Paleta Selecionada</h3>
               </div>
 
-              <div className="space-y-2">
-                <label className="label-corporate">Cor Secundária</label>
-                <div className="flex gap-3 items-center">
-                  <input
-                    type="color"
-                    value={themeSettings.theme_secondary_color}
-                    onChange={(e) => setThemeSettings({ ...themeSettings, theme_secondary_color: e.target.value })}
-                    className="h-12 w-20 rounded border border-border cursor-pointer"
-                  />
-                  <input
-                    type="text"
-                    value={themeSettings.theme_secondary_color}
-                    onChange={(e) => setThemeSettings({ ...themeSettings, theme_secondary_color: e.target.value })}
-                    className="input-corporate"
-                  />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-3">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Botões e Ações</p>
+                  <div className="flex flex-wrap gap-3">
+                    <button className="px-5 py-2.5 rounded-lg text-white text-sm font-medium shadow-sm transition-opacity hover:opacity-90" style={{ backgroundColor: themeSettings.theme_primary_color }}>
+                      Primário
+                    </button>
+                    <button className="px-5 py-2.5 rounded-lg text-white text-sm font-medium shadow-sm transition-opacity hover:opacity-90" style={{ backgroundColor: themeSettings.theme_secondary_color }}>
+                      Secundário
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <label className="label-corporate">Cor de Destaque (Accent)</label>
-                <div className="flex gap-3 items-center">
-                  <input
-                    type="color"
-                    value={themeSettings.theme_accent_color}
-                    onChange={(e) => setThemeSettings({ ...themeSettings, theme_accent_color: e.target.value })}
-                    className="h-12 w-20 rounded border border-border cursor-pointer"
-                  />
-                  <input
-                    type="text"
-                    value={themeSettings.theme_accent_color}
-                    onChange={(e) => setThemeSettings({ ...themeSettings, theme_accent_color: e.target.value })}
-                    className="input-corporate"
-                  />
+                <div className="space-y-3">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Interface e Destaques</p>
+                  <div className="flex flex-wrap gap-3">
+                    <div className="px-4 py-2 rounded-full text-white text-xs font-bold" style={{ backgroundColor: themeSettings.theme_accent_color }}>
+                      ITEM EM DESTAQUE
+                    </div>
+                    <div className="w-10 h-10 rounded-full border-2 border-primary" style={{ borderColor: themeSettings.theme_primary_color }} />
+                  </div>
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <label className="label-corporate">Cor de Fundo</label>
-                <div className="flex gap-3 items-center">
-                  <input
-                    type="color"
-                    value={themeSettings.theme_background_color}
-                    onChange={(e) => setThemeSettings({ ...themeSettings, theme_background_color: e.target.value })}
-                    className="h-12 w-20 rounded border border-border cursor-pointer"
-                  />
-                  <input
-                    type="text"
-                    value={themeSettings.theme_background_color}
-                    onChange={(e) => setThemeSettings({ ...themeSettings, theme_background_color: e.target.value })}
-                    className="input-corporate"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="label-corporate">Cor da Barra Lateral</label>
-                <div className="flex gap-3 items-center">
-                  <input
-                    type="color"
-                    value={themeSettings.theme_sidebar_color}
-                    onChange={(e) => setThemeSettings({ ...themeSettings, theme_sidebar_color: e.target.value })}
-                    className="h-12 w-20 rounded border border-border cursor-pointer"
-                  />
-                  <input
-                    type="text"
-                    value={themeSettings.theme_sidebar_color}
-                    onChange={(e) => setThemeSettings({ ...themeSettings, theme_sidebar_color: e.target.value })}
-                    className="input-corporate"
-                  />
+                <div className="space-y-3">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Navegação e Fundo</p>
+                  <div className="flex gap-4">
+                    <div className="w-14 h-20 rounded-lg shadow-inner overflow-hidden border border-border" style={{ backgroundColor: themeSettings.theme_background_color }}>
+                      <div className="w-4 h-full" style={{ backgroundColor: themeSettings.theme_sidebar_color }} />
+                    </div>
+                    <div className="text-[10px] text-muted-foreground mt-2 leading-relaxed italic">
+                      Visual conceptual de como cores<br />se comportam na UI.
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-10 p-6 bg-muted/20 rounded-xl border border-dashed border-border">
-              <h3 className="font-medium text-foreground mb-4">Pré-visualização do Tema</h3>
-              <div className="flex flex-wrap gap-4">
-                <div
-                  className="px-4 py-2 rounded-lg text-white font-medium shadow-sm"
-                  style={{ backgroundColor: themeSettings.theme_primary_color }}
-                >
-                  Botão Primário
-                </div>
-                <div
-                  className="px-4 py-2 rounded-lg text-white font-medium shadow-sm"
-                  style={{ backgroundColor: themeSettings.theme_secondary_color }}
-                >
-                  Botão Secundário
-                </div>
-                <div
-                  className="px-4 py-2 rounded-lg text-white font-medium shadow-sm"
-                  style={{ backgroundColor: themeSettings.theme_accent_color }}
-                >
-                  Destaque
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end pt-8">
+            <div className="flex justify-end pt-10 border-t border-border mt-10">
               <button
                 onClick={handleThemeUpdate}
                 disabled={savingTheme}
-                className="btn-primary w-full md:w-auto"
+                className="btn-primary w-full md:w-[240px] h-12 flex items-center justify-center gap-2"
               >
-                {savingTheme ? "Salvando..." : "Aplicar Tema Global"}
+                {savingTheme ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Salvando...
+                  </>
+                ) : (
+                  <>
+                    <Paintbrush className="w-4 h-4" />
+                    Aplicar Tema Global
+                  </>
+                )}
               </button>
             </div>
           </div>
