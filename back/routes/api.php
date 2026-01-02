@@ -6,8 +6,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DemandaController;
 use App\Http\Controllers\ComunicadoController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ThemeController;
 
+Route::get('/theme', [ThemeController::class, 'index']);
 Route::post('/login', [AuthController::class, 'login']);
+
 Route::post('/demandas', [DemandaController::class, 'store']); // Public creation endpoint
 Route::get('/consultar/{protocolo}', [DemandaController::class, 'search']); // Public search endpoint
 Route::post('/demandas/{id}/rate', [DemandaController::class, 'rate']); // Public rating endpoint
@@ -32,6 +35,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // User CRUD (Admin)
     Route::apiResource('users', UserController::class);
+
+    // Theme Update (Admin)
+    Route::put('/theme', [ThemeController::class, 'update']);
 
     Route::get('/user', function (Request $request) {
         return $request->user();

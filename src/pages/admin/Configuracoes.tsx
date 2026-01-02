@@ -1,6 +1,8 @@
-import { Settings, User, Bell, Shield, Palette, Lock, Camera } from "lucide-react";
+import { Settings, User, Bell, Shield, Palette, Lock, Camera, Paintbrush } from "lucide-react";
 import { useState, useEffect } from "react";
 import api from "../../services/api";
+import { themeService, ThemeSettings } from "@/services/themeService";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -45,10 +47,44 @@ const AdminConfiguracoes = () => {
     timezone: "America/Sao_Paulo",
   });
 
+  const queryClient = useQueryClient();
+  const [themeSettings, setThemeSettings] = useState<ThemeSettings>({
+    theme_primary_color: "#3b82f6",
+    theme_secondary_color: "#1e40af",
+    theme_accent_color: "#f59e0b",
+    theme_background_color: "#ffffff",
+    theme_sidebar_color: "#1f2937",
+  });
+  const [savingTheme, setSavingTheme] = useState(false);
+
   useEffect(() => {
     fetchUserData();
     loadLocalSettings();
+    fetchThemeSettings();
   }, []);
+
+  const fetchThemeSettings = async () => {
+    try {
+      const data = await themeService.getTheme();
+      setThemeSettings(data);
+    } catch (error) {
+      console.error("Erro ao carregar tema:", error);
+    }
+  };
+
+  const handleThemeUpdate = async () => {
+    setSavingTheme(true);
+    try {
+      await themeService.updateTheme(themeSettings);
+      toast.success("Tema global atualizado com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ['globalTheme'] });
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao salvar tema global");
+    } finally {
+      setSavingTheme(false);
+    }
+  };
 
   useEffect(() => {
     calculateStrength(passwords.new);
@@ -251,9 +287,10 @@ const AdminConfiguracoes = () => {
       </div>
 
       <Tabs defaultValue="account" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+        <TabsList className="grid w-full grid-cols-3 lg:w-[600px]">
           <TabsTrigger value="account">Minha Conta</TabsTrigger>
           <TabsTrigger value="preferences">Preferências</TabsTrigger>
+          <TabsTrigger value="theme">Customização</TabsTrigger>
         </TabsList>
 
         {/* Tab: Minha Conta */}
@@ -456,6 +493,147 @@ const AdminConfiguracoes = () => {
             <button onClick={saveLocalSettings} className="btn-primary w-full md:w-auto">
               Salvar Preferências
             </button>
+          </div>
+        </TabsContent>
+
+        {/* Tab: Customização */}
+        <TabsContent value="theme" className="mt-6 space-y-6">
+          <div className="card-corporate">
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <Paintbrush className="w-5 h-5 text-primary" />
+                Tema Global do Sistema
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Altere a identidade visual para todos os usuários do sistema.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="space-y-2">
+                <label className="label-corporate">Cor Primária</label>
+                <div className="flex gap-3 items-center">
+                  <input
+                    type="color"
+                    value={themeSettings.theme_primary_color}
+                    onChange={(e) => setThemeSettings({ ...themeSettings, theme_primary_color: e.target.value })}
+                    className="h-12 w-20 rounded border border-border cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={themeSettings.theme_primary_color}
+                    onChange={(e) => setThemeSettings({ ...themeSettings, theme_primary_color: e.target.value })}
+                    className="input-corporate"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="label-corporate">Cor Secundária</label>
+                <div className="flex gap-3 items-center">
+                  <input
+                    type="color"
+                    value={themeSettings.theme_secondary_color}
+                    onChange={(e) => setThemeSettings({ ...themeSettings, theme_secondary_color: e.target.value })}
+                    className="h-12 w-20 rounded border border-border cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={themeSettings.theme_secondary_color}
+                    onChange={(e) => setThemeSettings({ ...themeSettings, theme_secondary_color: e.target.value })}
+                    className="input-corporate"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="label-corporate">Cor de Destaque (Accent)</label>
+                <div className="flex gap-3 items-center">
+                  <input
+                    type="color"
+                    value={themeSettings.theme_accent_color}
+                    onChange={(e) => setThemeSettings({ ...themeSettings, theme_accent_color: e.target.value })}
+                    className="h-12 w-20 rounded border border-border cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={themeSettings.theme_accent_color}
+                    onChange={(e) => setThemeSettings({ ...themeSettings, theme_accent_color: e.target.value })}
+                    className="input-corporate"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="label-corporate">Cor de Fundo</label>
+                <div className="flex gap-3 items-center">
+                  <input
+                    type="color"
+                    value={themeSettings.theme_background_color}
+                    onChange={(e) => setThemeSettings({ ...themeSettings, theme_background_color: e.target.value })}
+                    className="h-12 w-20 rounded border border-border cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={themeSettings.theme_background_color}
+                    onChange={(e) => setThemeSettings({ ...themeSettings, theme_background_color: e.target.value })}
+                    className="input-corporate"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="label-corporate">Cor da Barra Lateral</label>
+                <div className="flex gap-3 items-center">
+                  <input
+                    type="color"
+                    value={themeSettings.theme_sidebar_color}
+                    onChange={(e) => setThemeSettings({ ...themeSettings, theme_sidebar_color: e.target.value })}
+                    className="h-12 w-20 rounded border border-border cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={themeSettings.theme_sidebar_color}
+                    onChange={(e) => setThemeSettings({ ...themeSettings, theme_sidebar_color: e.target.value })}
+                    className="input-corporate"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-10 p-6 bg-muted/20 rounded-xl border border-dashed border-border">
+              <h3 className="font-medium text-foreground mb-4">Pré-visualização do Tema</h3>
+              <div className="flex flex-wrap gap-4">
+                <div
+                  className="px-4 py-2 rounded-lg text-white font-medium shadow-sm"
+                  style={{ backgroundColor: themeSettings.theme_primary_color }}
+                >
+                  Botão Primário
+                </div>
+                <div
+                  className="px-4 py-2 rounded-lg text-white font-medium shadow-sm"
+                  style={{ backgroundColor: themeSettings.theme_secondary_color }}
+                >
+                  Botão Secundário
+                </div>
+                <div
+                  className="px-4 py-2 rounded-lg text-white font-medium shadow-sm"
+                  style={{ backgroundColor: themeSettings.theme_accent_color }}
+                >
+                  Destaque
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-8">
+              <button
+                onClick={handleThemeUpdate}
+                disabled={savingTheme}
+                className="btn-primary w-full md:w-auto"
+              >
+                {savingTheme ? "Salvando..." : "Aplicar Tema Global"}
+              </button>
+            </div>
           </div>
         </TabsContent>
       </Tabs>

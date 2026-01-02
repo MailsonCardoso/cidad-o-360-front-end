@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 // Layouts
 import PublicLayout from "@/components/layout/PublicLayout";
 import AdminLayout from "@/components/layout/AdminLayout";
+import ThemeManager from "@/components/ThemeManager";
 
 // Public Pages
 import Index from "@/pages/Index";
@@ -35,10 +36,9 @@ import AdminQualidade from "@/pages/admin/Qualidade";
 
 const queryClient = new QueryClient();
 
-
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <ThemeManager />
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -60,7 +60,7 @@ const App = () => (
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="qualidade" element={<AdminQualidade />} />
             <Route path="demandas" element={<AdminDemandas />} />
-            <Route path="cadastro" element={<AdminCadastroDemanda />} /> {/* New Route */}
+            <Route path="cadastro" element={<AdminCadastroDemanda />} />
             <Route path="demandas/:id" element={<AdminDemandaDetalhe />} />
             <Route path="comunicados" element={<AdminComunicados />} />
             <Route path="users" element={<AdminUsers />} />
@@ -72,6 +72,8 @@ const App = () => (
             <Route path="alterar-senha" element={<AdminChangePassword />} />
             <Route path="configuracoes" element={<AdminConfiguracoes />} />
           </Route>
+
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
