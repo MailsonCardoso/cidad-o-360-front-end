@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
     proxy: {
       '/api': {
-        target: 'http://192.168.176.30:8000',
+        target: 'https://api6.platformx.com.br',
         changeOrigin: true,
         secure: false,
       }
