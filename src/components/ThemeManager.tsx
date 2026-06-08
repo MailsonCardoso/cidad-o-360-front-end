@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { themeService } from '@/services/themeService';
 import { useQuery } from '@tanstack/react-query';
 
-// Helper to convert HEX to HSL format (H S% L% as space separated values for Tailwind)
 const hexToHSLForTailwind = (hex: string): string => {
     let r = 0, g = 0, b = 0;
     if (hex.length === 4) {
@@ -35,36 +34,43 @@ const hexToHSLForTailwind = (hex: string): string => {
     return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
 };
 
+const isValidTheme = (data: unknown): data is Record<string, string> => {
+    if (!data || typeof data !== 'object') return false;
+    const keys = ['theme_primary_color', 'theme_secondary_color', 'theme_accent_color', 'theme_background_color', 'theme_sidebar_color'];
+    return keys.every(k => k in (data as Record<string, unknown>));
+};
+
+const applyTheme = (theme: Record<string, string>) => {
+    const root = document.documentElement;
+    const colors: Record<string, string> = {
+        '--primary': theme.theme_primary_color,
+        '--secondary': theme.theme_secondary_color,
+        '--accent': theme.theme_accent_color,
+        '--background': theme.theme_background_color,
+        '--sidebar-background': theme.theme_sidebar_color,
+        '--sidebar-foreground': '0 0% 100%',
+    };
+    Object.entries(colors).forEach(([key, value]) => {
+        if (value && value.startsWith('#')) {
+            root.style.setProperty(key, hexToHSLForTailwind(value));
+        } else if (value) {
+            root.style.setProperty(key, value);
+        }
+    });
+};
+
 const ThemeManager = () => {
     const { data: theme } = useQuery({
         queryKey: ['globalTheme'],
         queryFn: themeService.getTheme,
         staleTime: 1000 * 60 * 10,
+        retry: 1,
     });
 
     useEffect(() => {
-        if (theme) {
-            const root = document.documentElement;
-
+        if (isValidTheme(theme)) {
             try {
-                if (theme.theme_primary_color) {
-                    root.style.setProperty('--primary', hexToHSLForTailwind(theme.theme_primary_color));
-                }
-                if (theme.theme_secondary_color) {
-                    root.style.setProperty('--secondary', hexToHSLForTailwind(theme.theme_secondary_color));
-                }
-                if (theme.theme_accent_color) {
-                    root.style.setProperty('--accent', hexToHSLForTailwind(theme.theme_accent_color));
-                }
-                if (theme.theme_background_color) {
-                    root.style.setProperty('--background', hexToHSLForTailwind(theme.theme_background_color));
-                }
-                if (theme.theme_sidebar_color) {
-                    root.style.setProperty('--sidebar-background', hexToHSLForTailwind(theme.theme_sidebar_color));
-                }
-
-                // Forçar letras brancas na sidebar conforme solicitado
-                root.style.setProperty('--sidebar-foreground', "0 0% 100%");
+                applyTheme(theme);
             } catch (err) {
                 console.error("Erro ao aplicar cores do tema:", err);
             }
