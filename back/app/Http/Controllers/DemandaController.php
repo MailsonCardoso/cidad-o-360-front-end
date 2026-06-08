@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Demanda;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
@@ -290,18 +292,24 @@ class DemandaController extends Controller
     public function stats()
     {
         $now = Carbon::now();
-        $last12Months = collect(range(11, 0))->map(function ($i) use ($now) {
+
+        $hasDemandaHistorico = Schema::hasTable('demanda_historicos');
+        $hasSatisfacao = Schema::hasColumn('demandas', 'satisfacao_nota');
+
+        $last12Months = collect(range(11, 0))->map(function ($i) use ($now, $hasDemandaHistorico) {
             $date = $now->copy()->subMonths($i);
             return [
                 'month' => $date->format('M/Y'),
                 'abertas' => Demanda::whereMonth('created_at', $date->month)
                     ->whereYear('created_at', $date->year)
                     ->count(),
-                'concluidas' => \App\Models\DemandaHistorico::where('status', 'Concluído')
-                    ->whereMonth('created_at', $date->month)
-                    ->whereYear('created_at', $date->year)
-                    ->distinct('demanda_id')
-                    ->count('demanda_id'),
+                'concluidas' => $hasDemandaHistorico
+                    ? \App\Models\DemandaHistorico::where('status', 'Concluído')
+                        ->whereMonth('created_at', $date->month)
+                        ->whereYear('created_at', $date->year)
+                        ->distinct('demanda_id')
+                        ->count('demanda_id')
+                    : 0,
             ];
         });
 
@@ -309,11 +317,13 @@ class DemandaController extends Controller
             'abertas' => Demanda::where('status', 'Aberto')->count(),
             'andamento' => Demanda::where('status', 'Em andamento')->count(),
             'concluidas' => Demanda::where('status', 'Concluído')->count(),
-            'concluidas_mes' => \App\Models\DemandaHistorico::where('status', 'Concluído')
-                ->whereMonth('created_at', $now->month)
-                ->whereYear('created_at', $now->year)
-                ->distinct('demanda_id')
-                ->count('demanda_id'),
+            'concluidas_mes' => $hasDemandaHistorico
+                ? \App\Models\DemandaHistorico::where('status', 'Concluído')
+                    ->whereMonth('created_at', $now->month)
+                    ->whereYear('created_at', $now->year)
+                    ->distinct('demanda_id')
+                    ->count('demanda_id')
+                : 0,
             'recentes' => Demanda::orderByRaw("
                 CASE 
                     WHEN status = 'Aberto' THEN 1
@@ -326,24 +336,28 @@ class DemandaController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->take(5)
                 ->get(),
-            'categorias' => Demanda::select('categoria', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+            'categorias' => Demanda::select('categoria', DB::raw('count(*) as total'))
                 ->groupBy('categoria')
                 ->get(),
-            'status_detalhado' => Demanda::select('status', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+            'status_detalhado' => Demanda::select('status', DB::raw('count(*) as total'))
                 ->groupBy('status')
                 ->get(),
-            'ranking_setores' => Demanda::select('categoria', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+            'ranking_setores' => Demanda::select('categoria', DB::raw('count(*) as total'))
                 ->groupBy('categoria')
                 ->orderBy('total', 'desc')
                 ->take(5)
                 ->get(),
             'tendencias' => $last12Months,
-            'media_satisfacao' => Demanda::whereNotNull('satisfacao_nota')->avg('satisfacao_nota') ?? 0,
-            'satisfacao_por_setor' => Demanda::select('categoria', \Illuminate\Support\Facades\DB::raw('avg(satisfacao_nota) as media'), \Illuminate\Support\Facades\DB::raw('count(*) as total'))
-                ->whereNotNull('satisfacao_nota')
-                ->groupBy('categoria')
-                ->orderBy('media', 'desc')
-                ->get(),
+            'media_satisfacao' => $hasSatisfacao
+                ? (Demanda::whereNotNull('satisfacao_nota')->avg('satisfacao_nota') ?? 0)
+                : 0,
+            'satisfacao_por_setor' => $hasSatisfacao
+                ? Demanda::select('categoria', DB::raw('avg(satisfacao_nota) as media'), DB::raw('count(*) as total'))
+                    ->whereNotNull('satisfacao_nota')
+                    ->groupBy('categoria')
+                    ->orderBy('media', 'desc')
+                    ->get()
+                : [],
         ];
 
         return response()->json([
