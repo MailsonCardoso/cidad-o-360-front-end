@@ -1,0 +1,55 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#1E40AF"/>
+  <rect width="1200" height="630" fill="url(#grad)" opacity="0.15"/>
+  
+  <rect x="80" y="60" width="1040" height="510" rx="24" fill="white" fill-opacity="0.05" stroke="white" stroke-opacity="0.1" stroke-width="1"/>
+  
+  <rect x="120" y="100" width="64" height="64" rx="16" fill="#2563EB"/>
+  <rect x="120" y="100" width="64" height="64" rx="16" fill="white" fill-opacity="0.2"/>
+  <path d="M140 132C140 127.582 143.582 124 148 124H156C160.418 124 164 127.582 164 132V132C164 136.418 160.418 140 156 140H148C143.582 140 140 136.418 140 132Z" fill="white"/>
+  <rect x="140" y="148" width="24" height="24" rx="4" fill="white" fill-opacity="0.8"/>
+  <circle cx="152" cy="135" r="8" fill="white" fill-opacity="0.4"/>
+  
+  <text x="210" y="144" font-family="Inter, Arial, sans-serif" font-size="36" font-weight="bold" fill="white">
+    Cidadão 360
+  </text>
+  
+  <text x="210" y="178" font-family="Inter, Arial, sans-serif" font-size="20" fill="white" fill-opacity="0.7">
+    Portal de Atendimento ao Cidadão
+  </text>
+  
+  <text x="120" y="280" font-family="Inter, Arial, sans-serif" font-size="48" font-weight="bold" fill="white">
+    Sua voz transforma a cidade
+  </text>
+  
+  <rect x="120" y="310" width="120" height="4" rx="2" fill="#F59E0B"/>
+  
+  <text x="120" y="350" font-family="Inter, Arial, sans-serif" font-size="22" fill="white" fill-opacity="0.8">
+    Registre demandas, acompanhe protocolos
+  </text>
+  <text x="120" y="382" font-family="Inter, Arial, sans-serif" font-size="22" fill="white" fill-opacity="0.8">
+    e participe ativamente da gestão pública
+  </text>
+  
+  <rect x="120" y="430" width="260" height="56" rx="28" fill="#F59E0B"/>
+  <text x="250" y="466" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="bold" fill="#1E40AF" text-anchor="middle">
+    ouvidoria.platformx.com.br
+  </text>
+  
+  <rect x="850" y="460" width="200" height="60" rx="12" fill="white" fill-opacity="0.05" stroke="white" stroke-opacity="0.1" stroke-width="1"/>
+  <circle cx="890" cy="490" r="8" fill="#10B981"/>
+  <text x="910" y="496" font-family="Inter, Arial, sans-serif" font-size="16" fill="white" fill-opacity="0.6">
+    Transparência
+  </text>
+  <circle cx="890" cy="510" r="8" fill="#F59E0B"/>
+  <text x="910" y="516" font-family="Inter, Arial, sans-serif" font-size="16" fill="white" fill-opacity="0.6">
+    Participação
+  </text>
+
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#1E40AF"/>
+    </linearGradient>
+  </defs>
+</svg>
