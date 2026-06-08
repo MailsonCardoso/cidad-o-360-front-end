@@ -2,6 +2,24 @@ import { useEffect } from 'react';
 import { themeService } from '@/services/themeService';
 import { useQuery } from '@tanstack/react-query';
 
+const DEFAULT_THEME = {
+  theme_primary_color: '#D62828',
+  theme_secondary_color: '#C0C0C0',
+  theme_accent_color: '#9D0208',
+  theme_background_color: '#FFFFFF',
+  theme_sidebar_color: '#1A1A1A',
+};
+
+const isDefaultTheme = (theme: Record<string, string>): boolean => {
+  return (
+    theme.theme_primary_color?.toUpperCase() === DEFAULT_THEME.theme_primary_color &&
+    theme.theme_secondary_color?.toUpperCase() === DEFAULT_THEME.theme_secondary_color &&
+    theme.theme_accent_color?.toUpperCase() === DEFAULT_THEME.theme_accent_color &&
+    theme.theme_background_color?.toUpperCase() === DEFAULT_THEME.theme_background_color &&
+    theme.theme_sidebar_color?.toUpperCase() === DEFAULT_THEME.theme_sidebar_color
+  );
+};
+
 const hexToHSLForTailwind = (hex: string): string => {
     let r = 0, g = 0, b = 0;
     if (hex.length === 4) {
@@ -68,7 +86,7 @@ const ThemeManager = () => {
     });
 
     useEffect(() => {
-        if (isValidTheme(theme)) {
+        if (isValidTheme(theme) && !isDefaultTheme(theme)) {
             try {
                 applyTheme(theme);
             } catch (err) {

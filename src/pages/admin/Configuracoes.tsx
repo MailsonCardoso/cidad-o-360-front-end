@@ -49,11 +49,11 @@ const AdminConfiguracoes = () => {
 
   const queryClient = useQueryClient();
   const [themeSettings, setThemeSettings] = useState<ThemeSettings>({
-    theme_primary_color: "#3b82f6",
-    theme_secondary_color: "#1e40af",
-    theme_accent_color: "#f59e0b",
-    theme_background_color: "#ffffff",
-    theme_sidebar_color: "#1f2937",
+    theme_primary_color: "#D62828",
+    theme_secondary_color: "#C0C0C0",
+    theme_accent_color: "#9D0208",
+    theme_background_color: "#FFFFFF",
+    theme_sidebar_color: "#1A1A1A",
   });
   const [savingTheme, setSavingTheme] = useState(false);
 
