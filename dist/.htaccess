@@ -2,6 +2,10 @@
   RewriteEngine On
   RewriteBase /
 
+  # Proxy API requests through PHP proxy
+  RewriteCond %{REQUEST_URI} ^/api/
+  RewriteRule ^api/(.*)$ proxy.php [QSA,L]
+
   # SPA routing - serve index.html for all non-file routes
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
