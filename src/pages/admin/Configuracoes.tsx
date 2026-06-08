@@ -572,6 +572,18 @@ const AdminConfiguracoes = () => {
                     theme_background_color: '#FAFAFA',
                     theme_sidebar_color: '#450A0A',
                   }
+                },
+                {
+                  id: 'ruby',
+                  name: 'Ruby Vermelho',
+                  description: 'Vermelho vibrante com contraste elegante.',
+                  colors: {
+                    theme_primary_color: '#D62828',
+                    theme_secondary_color: '#C0C0C0',
+                    theme_accent_color: '#9D0208',
+                    theme_background_color: '#FFFFFF',
+                    theme_sidebar_color: '#1A1A1A',
+                  }
                 }
               ].map((theme) => {
                 const isSelected =
